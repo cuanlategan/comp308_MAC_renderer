@@ -60,27 +60,26 @@ vec3 g_camera_eye(0.f,0.f,0.f);
 // Remove when modifying main.cpp for Assignment 3
 //
 bool g_useShader = true;
-GLuint g_brick_tex = 0;
 GLuint g_phong_sdr = 0;
 GLuint g_grass_tex = 0;
 
 // Objects to be rendered
 WaveGenerator *g_wave_generator;
 Field field;
-
+bool draw_points = false;
+bool draw_geometry = true;
 float t = 0.f;
 
+/*
 bool draw_lights = true;
 bool draw_ambiant_light = true;
 bool draw_spot_light = true;
 bool draw_directional_light = true;
 bool draw_point_light = true;
-bool draw_points = false;
-bool draw_geometry = true;
+*/
 
-float spot_cutoff = 6.5f;
-float table_rotation = 0.f;
-bool rotate_table = false;
+
+
 
 
 
