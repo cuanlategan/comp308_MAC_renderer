@@ -71,4 +71,10 @@ public:
 		}
 		return r;
 	}
+
+	float getIntensity(int x, int y) {
+		int i = y*w*n + x*n;
+		return data[i];
+	}
+
 };
