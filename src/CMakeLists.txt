@@ -16,7 +16,13 @@ SET(headers
 	"grass.h"
 	"wave_generator.h"
 	"field.h"
-	"grid.h")
+	"grid.h"
+	"RiverHandler.h"
+	"RiverPoint.h"
+	"vEdge.h"
+	"vVertexPoint.h"
+	"vTriangle.h"
+	"imageLoader.hpp")
 
 
 # TODO list your source files (.cpp) here
@@ -25,7 +31,13 @@ SET(sources
 	"geometry.cpp"
 	"grass.cpp"
 	"field.cpp"
-	"grid.cpp" )
+	"grid.cpp"
+	"RiverHandler.cpp"
+	"RiverPoint.cpp"
+	"vEdge.cpp"
+	"VoronoiHandler.cpp"
+	"vTriangle.cpp"
+	"vVertexPoint.cpp")
 
 # Add executable target and link libraries
 # You do not need to touch this

@@ -27,7 +27,6 @@
 #include "geometry.hpp"
 #include "define.h"
 #include "cuan_define.h"
-//#include "grass.h"
 #include "wave_generator.h"
 #include "field.h"
 
@@ -66,20 +65,21 @@ GLuint g_grass_tex = 0;
 // Objects to be rendered
 WaveGenerator *g_wave_generator;
 Field field;
-bool draw_points = false;
-bool draw_geometry = true;
+
 float t = 0.f;
 
-/*
 bool draw_lights = true;
 bool draw_ambiant_light = true;
 bool draw_spot_light = true;
 bool draw_directional_light = true;
 bool draw_point_light = true;
-*/
 
+bool draw_points = false;
+bool draw_geometry = true;
 
-
+float spot_cutoff = 6.5f;
+float table_rotation = 0.f;
+bool rotate_table = false;
 
 
 
@@ -275,27 +275,6 @@ void initLight() {
 //
 void initTexture() {
 
-    glMatrixMode(GL_TEXTURE);
-    glPushMatrix();
-    {
-        glScalef(8.f, 8.f, 8.f);
-
-        Image tex_brick("./textures/brick.jpg");
-        glGenTextures(1, &g_brick_tex); // Generate texture ID
-
-        glBindTexture(GL_TEXTURE_2D, g_brick_tex); // Bind it as a 2D texture
-        // Finnaly, actually fill the data into our texture
-        gluBuild2DMipmaps(GL_TEXTURE_2D, 3, tex_brick.w, tex_brick.h, tex_brick.glFormat(), GL_UNSIGNED_BYTE,
-                          tex_brick.dataPointer());
-
-        // Setup sampling strategies
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        //glBindTexture(GL_TEXTURE_2D, 0);
-    }
-    glPopMatrix();
 
 
     Image tex_grass("./textures/tall-grass3.png");
