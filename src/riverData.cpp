@@ -52,7 +52,7 @@ void quadtree::add(river river) {
     } else if (bbox.topleft.x < center.x && bbox.topleft.x + bbox.width < center.x
                && bbox.topleft.y >= center.y) {
         if (se == nullptr) {
-            se = new quadtree(vec2(center.x - (size/4).x, center.y + (size/4).y, size/2));
+            se = new quadtree(vec2(center.x - (size/4).x, center.y + (size/4).y), size/2);
         }
         se->add(river);
     } else if (bbox.topleft.x >= center.x && bbox.topleft.y >= center.y) {

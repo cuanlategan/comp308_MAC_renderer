@@ -10,7 +10,7 @@
 // 2D bounding box, viewed from above
 struct bbox {
     cgra::vec2 topleft;
-    unsigned float width, height;
+    /*unsigned*/ float width, height;
 };
 
 struct river {
@@ -44,4 +44,5 @@ struct quadtree {
     void add(river);
 };
 
-quadtree index;
+// TODO figure out the area the index should cover
+quadtree riverIndex(cgra::vec2(0.5, 0.5), cgra::vec2(1, 1));
