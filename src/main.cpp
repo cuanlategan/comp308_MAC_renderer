@@ -29,6 +29,7 @@
 #include "cuan_define.h"
 #include "wave_generator.h"
 #include "field.h"
+#include "RiverHandler.h"
 
 using namespace std;
 using namespace cgra;
@@ -62,9 +63,13 @@ bool g_useShader = true;
 GLuint g_phong_sdr = 0;
 GLuint g_grass_tex = 0;
 
+
 // Objects to be rendered
 WaveGenerator *g_wave_generator;
 Field field;
+// Marks River Gen
+RiverHandler *g_riverHandler;
+
 
 float t = 0.f;
 
@@ -277,7 +282,7 @@ void initTexture() {
 
 
 
-    Image tex_grass("./textures/tall-grass3.png");
+    Image tex_grass("./res/textures/tall-grass3.png");
     glGenTextures(1, &g_grass_tex); // Generate texture ID
 
     glBindTexture(GL_TEXTURE_2D, g_grass_tex); // Bind it as a 2D texture
@@ -305,7 +310,7 @@ void initShader() {
     // We pass it an array of the types of shaders we want to compile
     // and the corrosponding locations for the files of each stage
     g_phong_sdr = makeShaderProgramFromFile({GL_VERTEX_SHADER, GL_FRAGMENT_SHADER},
-                                         {"./shaders/phongVert.vert", "./shaders/phongFrag.frag"});
+                                         {"./res/shaders/phongVert.vert", "./res/shaders/phongFrag.frag"});
 }
 
 
@@ -400,9 +405,13 @@ void render(int width, int height) {
 
         glUseProgram(g_phong_sdr);
 
-
         t+=0.02;
         if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
+
+        glEnable(GL_ALPHA_TEST);
+        glAlphaFunc(GL_GREATER, 0.5f);
+
+
         glUniform1f(glGetUniformLocation(g_phong_sdr,"time"),t); // set time uniform in shaders
         glUniform1f(glGetUniformLocation(g_phong_sdr,"wavelength"), 4.567);
         glUniform1f(glGetUniformLocation(g_phong_sdr,"amplitude"), 0.3f);
@@ -575,11 +584,13 @@ int main(int argc, char **argv) {
     // YOUR CODE GOES HERE
     // ...
 
+    g_riverHandler = new RiverHandler();
     g_wave_generator = new WaveGenerator();
 
     g_wave_generator->addGerstnerWave(4.567,0.3,.8,1.5,vec2(-.3f, 1.f));
     g_wave_generator->addGerstnerWave(7.685,0.2,.8,1.5,vec2(-.35f, 0.8f));
     g_wave_generator->addGerstnerWave(2.2,0.1,.1,1.5,vec2(0.f, -1.0f));
+    g_wave_generator->addGerstnerWave(16.2,1.0,.75,2.5,vec2(0.f, 1.0f));
 
 
 

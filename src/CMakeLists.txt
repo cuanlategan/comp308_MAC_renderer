@@ -22,7 +22,8 @@ SET(headers
 	"vEdge.h"
 	"vVertexPoint.h"
 	"vTriangle.h"
-	"imageLoader.hpp")
+	"imageLoader.hpp"
+	"CImg.h")
 
 
 # TODO list your source files (.cpp) here

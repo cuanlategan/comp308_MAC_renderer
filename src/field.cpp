@@ -31,10 +31,10 @@ void Field::generateCluster(int num_clusters) {
     for(int i=0; i<num_clusters; i++){
         for(int j=0; j<num_clusters; j++){
 
-            float x = float(i)-num_clusters/2;
-            float y = float(j)-num_clusters/2;
-            //float x = float(i) +float((rand()%100)/200.f) -num_clusters/2;
-            //float y = float(j) +float((rand()%100)/200.f) -num_clusters/2;
+            //float x = float(i)-num_clusters/2;
+            //float y = float(j)-num_clusters/2;
+            float x = float(i) +float((rand()%100)/200.f) -num_clusters/2;
+            float y = float(j) +float((rand()%100)/200.f) -num_clusters/2;
             Grass grass(cgra::vec3(x,y,0.f));
             grass_clusters->push_back(grass);
 
@@ -78,7 +78,17 @@ void Field::renderField(WaveGenerator* wave_gen, float time) {
 void Field::renderFieldShader(WaveGenerator *wave_gen, float time, GLint shader) {
 
 
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GREATER, 0.5f);
 
+
+    glUniform1f(glGetUniformLocation(shader,"time"),time); // set time uniform in shaders
+    glUniform1f(glGetUniformLocation(shader,"wavelength"), 4.567);
+    glUniform1f(glGetUniformLocation(shader,"amplitude"), 0.3f);
+    glUniform1f(glGetUniformLocation(shader,"steepnes"), 0.8f);
+    glUniform1f(glGetUniformLocation(shader,"speed"), 1.5);
+    GLfloat dir[2] = {-0.3f, 1.f};
+    glUniform2fv(glGetUniformLocation(shader,"direction"),2,dir);
 
     glEnableClientState( GL_VERTEX_ARRAY );						// Enable Vertex Arrays
     glEnableClientState( GL_TEXTURE_COORD_ARRAY );

@@ -16,7 +16,7 @@ struct Gerstner {
 
     float amplitude;
     cgra::vec2 direction;
-    float time;
+    //float time;
     float frequency;
     float phase_const;
     float QA;

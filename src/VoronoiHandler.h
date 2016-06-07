@@ -6,7 +6,7 @@
 #include <random>
 #include <queue>
 #include <unordered_map>
-
+#include <list>
 #include "cgra_math.hpp"
 #include "cgra_geometry.hpp"
 #include "opengl.hpp"

@@ -2,7 +2,7 @@
 
 
 RiverHandler::RiverHandler() {
-	heightMap = new Image("./work/res/textures/simplebump.png");
+	heightMap = new Image("./res/textures/simplebump.png");
 
 	this -> graph = new VoronoiHandler(density);
 	graph -> sampleImage(imageSize, heightMap);
@@ -160,7 +160,7 @@ void RiverHandler::drawAll() {
 	const unsigned char cYellow[] = { 255,255,0 };
 
 	CImg<unsigned char>  pointDisplay(imageSize, imageSize, 1, 3, 0);
-	// pointDisplay.assign("./work/res/textures/simplebump.pgm");
+	// pointDisplay.assign(".res/textures/simplebump.pgm");
 	int radius = 2;
 
 	cout << "Found " << graph->getTriangles().size() << " triangles, with " << graph->getTriEdges().size() << " edges." << endl;

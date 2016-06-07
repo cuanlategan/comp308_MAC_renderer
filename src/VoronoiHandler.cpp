@@ -1,5 +1,6 @@
 #include "VoronoiHandler.h"
-
+using namespace std;
+using namespace cgra;
 // ############################################################
 // Voronoi Handler Class
 // ############################################################

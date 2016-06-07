@@ -23,7 +23,7 @@ private:
 	int density = 400;
 	//Image heightMap = Image("./work/res/textures/test_heightmap.png");
 	Image *heightMap;
-	CImg<unsigned char> drawheightMap = CImg<unsigned char>("./work/res/textures/simplebump.pgm");
+	CImg<unsigned char> drawheightMap = CImg<unsigned char>("./res/textures/simplebump.pgm");
 	int imageSize = drawheightMap.width();
 	//int imageSize = 1024;
 
