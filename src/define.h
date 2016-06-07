@@ -5,7 +5,7 @@
 #ifndef CGRA_PROJECT_A3_DEFINE_MATERIALS_H
 #define CGRA_PROJECT_A3_DEFINE_MATERIALS_H
 
-#include <GL/gl.h>
+#include "opengl.hpp"
 
 //=====================================================================
 //                      MATERIALS

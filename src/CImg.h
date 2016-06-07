@@ -267,6 +267,9 @@
 #error CImg Library: Configuration variable 'cimg_display' is badly defined.
 #error (should be { 0=none | 1=X-Window (X11) | 2=Microsoft GDI32 }).
 #endif
+#if defined(__MACOSX__)  || defined(__APPLE__)
+#define cimg_display 0
+#endif
 
 // Include display-specific headers.
 #if cimg_display==1
