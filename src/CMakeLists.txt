@@ -23,7 +23,8 @@ SET(headers
 	"vVertexPoint.h"
 	"vTriangle.h"
 	"imageLoader.hpp"
-	"CImg.h")
+	"CImg.h"
+	"riverData.hpp")
 
 
 # TODO list your source files (.cpp) here
@@ -38,7 +39,8 @@ SET(sources
 	"vEdge.cpp"
 	"VoronoiHandler.cpp"
 	"vTriangle.cpp"
-	"vVertexPoint.cpp")
+	"vVertexPoint.cpp"
+	"riverData.cpp")
 
 # Add executable target and link libraries
 # You do not need to touch this
