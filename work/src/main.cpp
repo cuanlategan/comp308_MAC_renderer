@@ -31,6 +31,8 @@
 #include "field.h"
 #include "RiverHandler.h"
 
+#include "bluenoise/sample.hpp"
+
 using namespace std;
 using namespace cgra;
 
@@ -315,6 +317,13 @@ void initShader() {
     // and the corrosponding locations for the files of each stage
     g_phong_sdr = makeShaderProgramFromFile({GL_VERTEX_SHADER, GL_FRAGMENT_SHADER},
                                          {"./work/res/shaders/phongVert.vert", "./work/res/shaders/phongFrag.frag"});
+}
+
+// Initializes the blue noise sampler and other useful resources for rendering water
+//
+void initWater() {
+    sampler riverSurface(0.01);
+    riverSurface.fillSpace();
 }
 
 

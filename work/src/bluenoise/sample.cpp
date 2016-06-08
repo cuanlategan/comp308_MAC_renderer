@@ -118,7 +118,7 @@ void sampler::fillSpace() {
         // TODO weight towards larger surface areas
         int c = rand()%candidates.size();
         cell cell = candidates[c];
-	
+
         add(candidate.sample());
     }
 }

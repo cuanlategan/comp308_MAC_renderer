@@ -28,7 +28,7 @@ struct sampler {
     float gridCellSize;
     float R;
 
-    vector<*cell> candidates;
+    vector<cell*> candidates;
     bool hasPoints;
     
     sampler(float radius);
