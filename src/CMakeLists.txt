@@ -26,8 +26,9 @@ SET(headers
 	"CImg.h"
 	"riverData.hpp"
 
-	"bluenoise/geom.hpp"
-	"bluenoise/sample.hpp")
+	#"bluenoise/geom.hpp"
+	#"bluenoise/sample.hpp"
+		)
 
 
 # TODO list your source files (.cpp) here
@@ -45,8 +46,9 @@ SET(sources
 	"vVertexPoint.cpp"
 	"riverData.cpp"
 
-	"bluenoise/geom.cpp"
-	"bluenoise/sample.cpp")
+	#"bluenoise/geom.cpp"
+	#"bluenoise/sample.cpp"
+		)
 
 # Add executable target and link libraries
 # You do not need to touch this

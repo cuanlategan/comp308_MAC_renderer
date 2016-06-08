@@ -32,6 +32,23 @@ vector<vec2> sampler::allPoints() {
     return points;
 }
 
+void remove(vector<*cell> cs, int i) {
+    candidates[c] = candidates[candidates.size()-1];
+    candidates.pop_back();
+}
+
 void sampler::fillSpace() {
-    // TODO
+    if (!hasPoints) {
+        add(vec2(2*random()-1, 2*random()-1));
+	candidates.push_back((int) points.size()-1);
+	// continue on to loop
+    }
+
+    while (candidates.size()) {
+        int c = rand()%candidates.size();
+	cell cell = candidates[c];
+	remove(candidates, c);
+	
+	
+    }
 }
