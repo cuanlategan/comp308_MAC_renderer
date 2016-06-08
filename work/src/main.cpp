@@ -361,39 +361,13 @@ void render(int width, int height) {
     // Uses the default OpenGL pipeline
     if (!g_useShader) {
 
-        //glDepthMask(GL_FALSE);
-        //glEnable(GL_BLEND);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        glEnable(GL_ALPHA_TEST);
-        glAlphaFunc(GL_GREATER, 0.5f);
-
-        glEnable(GL_TEXTURE_2D);
-        glActiveTexture(GL_TEXTURE0);
-
 
         t+=0.02;
         if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
-        if(draw_geometry)
-        {
-            field.renderField(g_wave_generator,t);
 
-        }
-
-
-        glDisable(GL_TEXTURE_2D);
-        glActiveTexture(GL_TEXTURE0);
-        glDisable(GL_TEXTURE_2D);
-
-        glEnable(GL_ALPHA_TEST);
-        glDisable(GL_BLEND);
-        glDepthMask(GL_TRUE);
-
-
-        if(draw_points)
-        {
-            field.renderGrid(g_wave_generator,t);
-        }
+        // cuans
+        if(draw_geometry){ field.renderField(g_wave_generator,t); }
+        if(draw_points){ field.renderGrid(g_wave_generator,t); }
 
         glFlush();
 
@@ -403,30 +377,19 @@ void render(int width, int height) {
     else {
 
 
-        glUseProgram(g_phong_sdr);
+
 
         t+=0.02;
         if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
 
-        glEnable(GL_ALPHA_TEST);
-        glAlphaFunc(GL_GREATER, 0.5f);
 
-
-        glUniform1f(glGetUniformLocation(g_phong_sdr,"time"),t); // set time uniform in shaders
-        glUniform1f(glGetUniformLocation(g_phong_sdr,"wavelength"), 4.567);
-        glUniform1f(glGetUniformLocation(g_phong_sdr,"amplitude"), 0.3f);
-        glUniform1f(glGetUniformLocation(g_phong_sdr,"steepnes"), 0.8f);
-        glUniform1f(glGetUniformLocation(g_phong_sdr,"speed"), 1.5);
-        GLfloat dir[2] = {-0.3f, 1.f};
-        glUniform2fv(glGetUniformLocation(g_phong_sdr,"direction"),2,dir);
-
-
+        glUseProgram(g_phong_sdr);
         field.renderFieldShader(g_wave_generator, t, g_phong_sdr);
+        glUseProgram(0); // Unbind our shader
 
         glFlush();
 
-        // Unbind our shader
-        glUseProgram(0);
+
     }
 
 
@@ -440,7 +403,7 @@ void render(int width, int height) {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glDisable(GL_NORMALIZE);
-    //glDisable(GL_BLEND);
+
 }
 
 

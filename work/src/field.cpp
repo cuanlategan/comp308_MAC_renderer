@@ -73,6 +73,13 @@ void Field::generateCluster(int num_clusters) {
 
 void Field::renderField(WaveGenerator* wave_gen, float time) {
 
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GREATER, 0.5f);
+
+    glEnable(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE0);
+
+
     for(auto &g: *grass_clusters){
 
             cgra::vec2 g_pos (g.getPosition().x,g.getPosition().y);
@@ -82,6 +89,14 @@ void Field::renderField(WaveGenerator* wave_gen, float time) {
             g.renderGeometry();
 
     }
+
+    glDisable(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE0);
+    glDisable(GL_TEXTURE_2D);
+
+    glEnable(GL_ALPHA_TEST);
+    glDisable(GL_BLEND);
+    glDepthMask(GL_TRUE);
 
 }
 
