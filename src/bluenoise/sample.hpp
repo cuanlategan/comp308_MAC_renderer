@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "../cgra_math.hpp"
 #include "geom.hpp"
 
@@ -25,6 +27,9 @@ struct sampler {
     int gridSize;
     float gridCellSize;
     float R;
+
+    vector<*cell> candidates;
+    bool hasPoints;
     
     sampler(float radius);
     std::vector<cgra::vec2> allPoints();
