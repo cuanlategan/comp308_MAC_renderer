@@ -1,19 +1,13 @@
 #version 120
 
 
-//attribute float height;
-
 uniform sampler2D centers;
 
 uniform float wavelength, amplitude, steepnes, speed;
+
 uniform vec2 direction;
 uniform float time;
 
-
-//float wavelength = 4.567;
-//float amplitude = 0.3;
-//float steepnes = 0.8;
-//float speed = 1.5;
 
 const float PI = 3.14159265359;
 vec4 calcGerstnerWave(float frequency, float QA,   vec2 direction,float phase_const);
@@ -42,10 +36,11 @@ void main(void)
 vec4 calcGerstnerWave(float frequency, float QA,   vec2 direction,float phase_const)
     {
 
-        //vec4 test = texture2D(centers, gl_TexCoord[1]);
+        //vec4 test = texture2D(centers, gl_TexCoord[0].st);
 
         vec2 dir = normalize(direction);
         float wave_phase = frequency * dot(dir,gl_Vertex.xy) + (time*phase_const);
+        //float wave_phase = frequency * dot(dir,test.xy) + (time*phase_const);
 
         float c = cos(wave_phase);
         float s = sin(wave_phase);

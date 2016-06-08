@@ -115,21 +115,25 @@ void Field::renderFieldShader(WaveGenerator *wave_gen, float time, GLint shader)
     GLfloat dir[2] = {-0.3f, 1.f};
     glUniform2fv(glGetUniformLocation(shader,"direction"),2,dir);
 
-    glUniform1i(glGetUniformLocation(shader,"centers"),m_nVBOCenters);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_nVBOCenters);
+    glUniform1i(glGetUniformLocation(shader,"centers"), 1);
+
+
+
 
     glEnableClientState( GL_VERTEX_ARRAY );						// Enable Vertex Arrays
     glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 
-    //GLint loc = glGetAttribLocationARB(shader,"height");
-    //glEnableVertexAttribArrayARB(loc);
 
     glBindBufferARB( GL_ARRAY_BUFFER_ARB, m_nVBOVertices );
     glVertexPointer( 3, GL_FLOAT, 0, 0);       // Set The Vertex Pointer To The Vertex Buffer
 
-    //glVertexAttribPointerARB(loc,1,GL_FLOAT,0,0,m_centers->data());
 
     glBindBufferARB( GL_ARRAY_BUFFER_ARB, m_nVBOTexCoords );
     glTexCoordPointer( 2, GL_FLOAT, 0, 0);     // Set The TexCoord Pointer To The TexCoord Buffer
+
 
     //glEnable(GL_TEXTURE_2D); // not needed because of binds above?
     //glActiveTexture(GL_TEXTURE0); // not needed because of binds above?
