@@ -63,10 +63,14 @@ bool g_useShader = true;
 GLuint g_phong_sdr = 0;
 GLuint g_grass_tex = 0;
 
+// Rivermap texture
+GLuint g_rivermap = 0;
 
 // Objects to be rendered
 WaveGenerator *g_wave_generator;
 Field field;
+Geometry *g_plane = nullptr;
+
 // Marks River Gen
 RiverHandler *g_riverHandler;
 
@@ -362,12 +366,21 @@ void render(int width, int height) {
     if (!g_useShader) {
 
 
+
+        
+
+
         t+=0.02;
         if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
 
-        // cuans
-        if(draw_geometry){ field.renderField(g_wave_generator,t); }
-        if(draw_points){ field.renderGrid(g_wave_generator,t); }
+		// cuan
+		if (draw_geometry) { field.renderField(g_wave_generator, t); }
+		if (draw_points) { field.renderGrid(g_wave_generator, t); }
+
+		glPushMatrix();
+		glScalef(10.0, 1.0, 10.0);
+		g_plane->renderGeometry();
+		glPopMatrix();
 
         glFlush();
 
@@ -377,19 +390,18 @@ void render(int width, int height) {
     else {
 
 
-
+        glUseProgram(g_phong_sdr);
 
         t+=0.02;
         if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
 
-
-        glUseProgram(g_phong_sdr);
+  
         field.renderFieldShader(g_wave_generator, t, g_phong_sdr);
-        glUseProgram(0); // Unbind our shader
 
         glFlush();
 
-
+        // Unbind our shader
+        glUseProgram(0);
     }
 
 
@@ -403,7 +415,7 @@ void render(int width, int height) {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glDisable(GL_NORMALIZE);
-
+    //glDisable(GL_BLEND);
 }
 
 
@@ -474,6 +486,8 @@ void APIENTRY debugCallbackARB(GLenum, GLenum, GLuint, GLenum, GLsizei, const GL
 //Main program
 // 
 int main(int argc, char **argv) {
+
+	
 
     // Initialize the GLFW library
     if (!glfwInit()) {
@@ -548,6 +562,11 @@ int main(int argc, char **argv) {
     // ...
 
     g_riverHandler = new RiverHandler();
+	g_riverHandler->drawAll();
+
+	g_plane = new Geometry("./work/res/assets/plane.obj");
+
+
     g_wave_generator = new WaveGenerator();
 
     g_wave_generator->addGerstnerWave(4.567,0.3,.8,1.5,vec2(-.3f, 1.f));

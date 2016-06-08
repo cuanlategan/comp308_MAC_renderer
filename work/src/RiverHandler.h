@@ -10,7 +10,7 @@
 #include "VoronoiHandler.h"
 #include "simple_image.hpp"
 #include "CImg.h"
-
+#include "splineHandler.hpp"
 
 using namespace std;
 using namespace cgra;
@@ -19,8 +19,11 @@ using namespace cimg_library;
 
 class RiverHandler {
 private:
-	int numberOfRivers = 1;
+	int numberOfRivers = 5;
 	int cutoffPercent = 5;
+	float startWater = 0.01;
+	int waterScalar = 1;
+	int widthScalar = 10;
 	int density = 400;
 	//Image heightMap = Image("./work/res/textures/test_heightmap.png");
 	Image *heightMap;
@@ -29,6 +32,7 @@ private:
 	//int imageSize = 1024;
 
 	VoronoiHandler *graph;
+	splineHandler *splineMaker;
 	vector<vVertexPoint*> riverPoints;
 	vector<vVertexPoint*> riverSources;
 	vector<vector<vVertexPoint*>> rivers;
@@ -46,11 +50,14 @@ private:
 	void drawEdges(vector<vEdge*>, CImg<unsigned char>*, const unsigned char[]);
 	void drawPoints(vector<vVertexPoint*>, CImg<unsigned char>*, const unsigned char[], const unsigned char[],int);
 	void drawRivers(vector<vector<vVertexPoint*>>, CImg<unsigned char>*, const unsigned char[], const unsigned char[], int);
+	void drawRiverSplines(vector<vector<vVertexPoint*>>, CImg<unsigned char>*, const unsigned char[], const unsigned char[], int);
+	
+	
 	void drawPolygons(vector<vTriangle*>, CImg<unsigned char>*, const unsigned char[], const unsigned char[], int);
 
 public:
 	RiverHandler();
-
+	void drawRiversGL();
 	void drawAll();
 
 
