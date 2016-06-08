@@ -1,14 +1,35 @@
 //
 //  sample.hpp
-//  
+//
+//  Generates blue noise to place river sprites on the water surface.
 //
 //  Created by Adrian Cochrane on 8/06/16.
 //
 //
 
-#ifndef sample_hpp
-#define sample_hpp
+#pragma once
 
-#include <stdio.h>
+#include "../cgra_math.hpp"
+#include "geom.hpp"
 
-#endif /* sample_hpp */
+#define MAX_PER_CELL 9
+
+struct cell {
+    cgra::vec2 P;
+    region boundary;
+};
+
+struct sampler {
+    int *fill;
+    cell (*grid)[MAX_PER_CELL];
+    int gridSize;
+    float gridCellSize;
+    float R;
+    
+    sampler(float radius);
+    std::vector<cgra::vec2> allPoints();
+    void fillSpace();
+    
+private:
+    // ?
+};
