@@ -6,7 +6,7 @@
 #include <random>
 #include <queue>
 #include <unordered_map>
-#include <list>
+
 #include "cgra_math.hpp"
 #include "cgra_geometry.hpp"
 #include "opengl.hpp"
@@ -15,9 +15,6 @@
 #include "vTriangle.h"
 #include "simple_image.hpp"
 
-
-
-// #define EPSILON 1.0e-7
 
 using namespace std;
 using namespace cgra;
