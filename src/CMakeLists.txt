@@ -24,7 +24,9 @@ SET(headers
 	"vTriangle.h"
 	"imageLoader.hpp"
 	"CImg.h"
-	"riverData.hpp")
+	"riverData.hpp"
+
+	"bluenoise/geom.hpp")
 
 
 # TODO list your source files (.cpp) here
@@ -40,7 +42,9 @@ SET(sources
 	"VoronoiHandler.cpp"
 	"vTriangle.cpp"
 	"vVertexPoint.cpp"
-	"riverData.cpp")
+	"riverData.cpp"
+
+	"bluenoise/geom.cpp")
 
 # Add executable target and link libraries
 # You do not need to touch this
