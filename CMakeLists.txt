@@ -32,18 +32,18 @@ find_package(OpenGL REQUIRED)
 #########################################################
 # Include GLFW Subproject
 #########################################################
-add_subdirectory("${PROJECT_SOURCE_DIR}/ext/glfw")
-include_directories("${PROJECT_SOURCE_DIR}/ext/glfw/include")
+add_subdirectory("work/ext/glfw")
+include_directories("work/ext/glfw/include")
 
 #########################################################
 # Include GLEW Subproject
 #########################################################
-add_subdirectory("${PROJECT_SOURCE_DIR}/ext/glew-1.10.0")
+add_subdirectory("work/ext/glew-1.10.0")
 
 #########################################################
 # Include STB Subproject
 #########################################################
-add_subdirectory("${PROJECT_SOURCE_DIR}/ext/stb")
+add_subdirectory("work/ext/stb")
 
 #########################################################
 # Set Compiler Flags
@@ -77,8 +77,8 @@ endif()
 #########################################################
 # Source Files
 #########################################################
-add_subdirectory(src) # Primary source files
-add_subdirectory(res) # Resources like shaders (show up in IDE)
+add_subdirectory(work/src) # Primary source files
+add_subdirectory(work/res) # Resources like shaders (show up in IDE)
 set_property(TARGET ${CGRA_PROJECT} PROPERTY FOLDER "CGRA")
 
 
