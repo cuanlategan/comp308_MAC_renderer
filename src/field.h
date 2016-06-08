@@ -21,6 +21,7 @@ private:
     std::vector<cgra::vec2>*m_uvs;
 
 
+
     float grass_width = 2.f;
 
     GLuint m_nVBOVertices = 0;
@@ -29,7 +30,7 @@ private:
 
 public:
 
-    std::vector<cgra::vec3>* m_centers; // TODO make private and add getter
+    std::vector<cgra::vec4>* m_centers; // TODO make private and add getter
 
 
     Field() {
@@ -38,7 +39,7 @@ public:
 
         m_points = new std::vector<cgra::vec3>;
         m_uvs = new std::vector<cgra::vec2>;
-        m_centers = new std::vector<cgra::vec3>;
+        m_centers = new std::vector<cgra::vec4>;
         m_points->reserve(GRID_DIMENSION * GRID_DIMENSION * 3 * 2 * 3);
         m_uvs->reserve(GRID_DIMENSION * GRID_DIMENSION * 3 * 2 * 3);
         m_centers->reserve(GRID_DIMENSION*GRID_DIMENSION);

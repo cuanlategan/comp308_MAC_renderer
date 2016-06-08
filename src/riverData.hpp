@@ -8,7 +8,7 @@
 #include "cgra_math.hpp"
 
 // 2D bounding box, viewed from above
-struct bbox {
+struct Box {
     cgra::vec2 topleft;
     /*unsigned*/ float width, height;
 };
@@ -17,7 +17,7 @@ struct river {
     float flow; // High fast the water should be moving
     float widthEnd; // How wide a river to render
     cgra::vec3 endPoint; // Where to render the river
-    bbox bbox; // To avoid generating sprites for offscreen rivers
+    Box bbox; // To avoid generating sprites for offscreen rivers
     
     std::vector<river> upstream; // where the water may be flowing in from.
     // If no upstream, this represents a starting point for the river. 
@@ -40,7 +40,7 @@ struct quadtree {
         delete sw;
         delete nw;
     }
-    void lookup(bbox bbox, std::vector<river>);
+    void lookup(Box bbox, std::vector<river>);
     void add(river);
 };
 

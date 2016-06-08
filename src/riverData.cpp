@@ -8,7 +8,7 @@ void extend(vector<river> a, vector<river> b) {
     for (int i = 0; i < b.size(); i++) a.push_back(b[i]);
 }
 
-void quadtree::lookup(bbox bbox, vector<river> results) {
+void quadtree::lookup(Box bbox, vector<river> results) {
     extend(results, rivers);
     
     if (bbox.topleft.x < center.x && bbox.topleft.y < center.y) {
@@ -37,7 +37,7 @@ void quadtree::lookup(bbox bbox, vector<river> results) {
 }
 
 void quadtree::add(river river) {
-    bbox bbox = river.bbox;
+    Box bbox = river.bbox;
     
     if (bbox.topleft.x < center.x && bbox.topleft.x + bbox.width < center.x &&
         bbox.topleft.y < center.y && bbox.topleft.y + bbox.height < center.y) {

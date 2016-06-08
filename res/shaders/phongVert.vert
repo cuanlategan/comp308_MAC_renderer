@@ -1,7 +1,7 @@
 #version 120
 
 
-attribute float height;
+//attribute float height;
 
 uniform float wavelength, amplitude, steepnes, speed;
 uniform vec2 direction;
@@ -22,14 +22,7 @@ void main(void)
 
    if(gl_TexCoord[0].y > .9){
       gl_Position = ftransform();
-   }/*else {
-      vec4 p;
-      p.x = gl_Vertex.x;
-      p.y = gl_Vertex.y;
-      p.z = gl_Vertex.z + sin(time);
-      p.w = 1.0;
-      gl_Position = gl_ModelViewProjectionMatrix * p;
-   }*/ else {
+   } else {
       //vec2 dir = normalize(direction);
       vec2 dir = vec2(-0.1,1.0);
       float freq = 2*PI/wavelength;

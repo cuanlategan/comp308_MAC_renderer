@@ -21,6 +21,11 @@ void Field::BuildVBOs()
     glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_uvs->size() * sizeof(float) * 2, m_uvs->data(), GL_STATIC_DRAW_ARB );
 
 
+    glGenBuffers( 1, &m_nVBOCenters);                  // Get A Valid Name
+    glBindBufferARB( GL_ARRAY_BUFFER_ARB, m_nVBOCenters );         // Bind The Buffer
+    // Load The Data
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_centers->size() * sizeof(float) * 4, m_centers->data(), GL_DYNAMIC_DRAW_ARB );
+
     // Our Copy Of The Data Is No Longer Necessary, It Is Safe In The Graphics Card
     //m_points->clear(); delete(m_points); m_points = NULL;
     //m_uvs->clear(); delete(m_uvs); m_uvs = NULL;
@@ -42,7 +47,12 @@ void Field::generateCluster(int num_clusters) {
             for(auto& point :grass.getPoints()){
                 m_points->push_back(point);
 
-               // m_centers->push_back(grass.getPosition());
+                cgra::vec4 center(grass.getPosition().x,
+                            grass.getPosition().y,
+                            grass.getPosition().z,
+                            1.0f);
+
+                m_centers->push_back(center);
             }
             for(auto& uv :grass.getUvs()){
                 m_uvs->push_back(uv);
@@ -93,20 +103,19 @@ void Field::renderFieldShader(WaveGenerator *wave_gen, float time, GLint shader)
     glEnableClientState( GL_VERTEX_ARRAY );						// Enable Vertex Arrays
     glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 
-    GLint loc = glGetAttribLocationARB(shader,"height");
-
-    glEnableVertexAttribArrayARB(loc);
+    //GLint loc = glGetAttribLocationARB(shader,"height");
+    //glEnableVertexAttribArrayARB(loc);
 
     glBindBufferARB( GL_ARRAY_BUFFER_ARB, m_nVBOVertices );
     glVertexPointer( 3, GL_FLOAT, 0, 0);       // Set The Vertex Pointer To The Vertex Buffer
 
-    glVertexAttribPointerARB(loc,1,GL_FLOAT,0,0,m_centers->data());
+    //glVertexAttribPointerARB(loc,1,GL_FLOAT,0,0,m_centers->data());
 
     glBindBufferARB( GL_ARRAY_BUFFER_ARB, m_nVBOTexCoords );
     glTexCoordPointer( 2, GL_FLOAT, 0, 0);     // Set The TexCoord Pointer To The TexCoord Buffer
 
-    glEnable(GL_TEXTURE_2D);
-    glActiveTexture(GL_TEXTURE0);
+    //glEnable(GL_TEXTURE_2D); // not needed because of binds above?
+    //glActiveTexture(GL_TEXTURE0); // not needed because of binds above?
 
 
     glPushMatrix();
