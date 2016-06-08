@@ -14,7 +14,9 @@
 
 #include <vector>
 
+/* Useful utilities, to be exposed to sample.cpp */
 float randf();
+float len2(cgra::vec2);
 
 struct arc {
     cgra::vec2 P;

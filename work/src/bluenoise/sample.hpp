@@ -19,6 +19,11 @@
 struct cell {
     cgra::vec2 P;
     region boundary;
+
+    cell(cgra::vec2 _P, region _boundary) {
+        P = _P; boundary = _boundary;
+    }
+    cell() {}
 };
 
 struct sampler {
@@ -28,7 +33,7 @@ struct sampler {
     float gridCellSize;
     float R;
 
-    vector<cell*> candidates;
+    std::vector<cell*> candidates;
     bool hasPoints;
     
     sampler(float radius);
@@ -36,5 +41,7 @@ struct sampler {
     void fillSpace();
     
 private:
-    // ?
+    std::vector<cell*> findNeighbours(cgra::vec2, float);
+    void add(cgra::vec2);
+    void getGridXY(cgra::vec2, int*, int*);
 };

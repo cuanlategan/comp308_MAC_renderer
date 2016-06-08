@@ -18,7 +18,7 @@ using namespace std;
 /* Utility functions */
 static const float 𝞃 = float(M_PI*2);
 
-inline float dist2(vec2 v) {
+inline float len2(vec2 v) {
     return v.x*v.x + v.y*v.y;
 }
 
@@ -69,7 +69,7 @@ arc::arc(vec2 _P, float _r, float _sign) {
 
 void arc::cache(vec2 pt, float 𝛼) {
     vec2 v = P - pt;
-    d2 = dist2(v);
+    d2 = len2(v);
     d = sqrt(d2);
     r2 = r*r;
     θ = anglev(v);
@@ -154,7 +154,7 @@ float sector::canonizeAngle(float 𝛼) {
 
 vec2 sector::distToCircle(float angle, vec2 C, float r) {
     vec2 v = C - P;
-    float d2 = dist2(v);
+    float d2 = len2(v);
     float θ = anglev(v);
     float 𝛼 = angle - θ;
     float sin_𝛼 = sin(𝛼);
