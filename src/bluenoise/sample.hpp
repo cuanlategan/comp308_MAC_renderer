@@ -22,7 +22,7 @@ struct cell {
 };
 
 struct sampler {
-    int *fill;
+    short int *fill;
     cell (*grid)[MAX_PER_CELL];
     int gridSize;
     float gridCellSize;

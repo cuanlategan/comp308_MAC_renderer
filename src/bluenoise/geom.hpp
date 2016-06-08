@@ -14,6 +14,8 @@
 
 #include <vector>
 
+float randf();
+
 struct arc {
     cgra::vec2 P;
     float r, sign, d, θ, integralAtStart;
@@ -52,4 +54,5 @@ struct region {
     region() {}
     cgra::vec2 generate();
     void clip(cgra::vec2, float);
+    bool isEmpty() {return regions.size() == 0;}
 };

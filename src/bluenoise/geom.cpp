@@ -26,12 +26,12 @@ inline float anglev(vec2 v) {
     return atan2(v.y, v.x);
 }
 
-inline float _random() {
+inline float randf() {
     return float(rand())/RAND_MAX;
 }
 
 inline float range(float lo, float hi) {
-    return lo + (hi-lo)*_random();
+    return lo + (hi-lo)*randf();
 }
 
 inline vec2 toVec2(float θ, float l) {
@@ -136,7 +136,7 @@ float sector::calcAngleForArea(float area) {
 }
 
 vec2 sector::generate() {
-    float 𝛼 = calcAngleForArea(area*_random());
+    float 𝛼 = calcAngleForArea(area*randf());
     float d1 = _distToCurve(𝛼, 0);
     float d2 = _distToCurve(𝛼, 1);
     float d = sqrt(range(d1*d1, d2*d2));
@@ -249,14 +249,14 @@ void sector::clip(vec2 C, float r, vector<sector> *regions) {
 static const float MIN_AREA = 0.00000001;
 
 region::region(vec2 p, float r) {
-    regions.push_back(sector(p, 0, 𝞃, arc(p, 2*r), arc(p, r*3)));
+    regions.push_back(sector(p, 0, 𝞃, arc(p, 2*r), arc(p, 4*r)));
     area = regions[0].area;
 }
 
 // generate()
 //
 vec2 region::generate() {
-    float a = area*_random();
+    float a = area*randf();
     for (int i = 0; i < regions.size(); i++) {
         if (a < regions[i].area) {
             return regions[i].generate();
