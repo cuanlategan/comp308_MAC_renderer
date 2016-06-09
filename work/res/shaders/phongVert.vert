@@ -12,6 +12,8 @@ uniform float time;
 const float PI = 3.14159265359;
 
 vec4 calcGerstnerWave(float frequency, float QA,   vec2 direction,float phase_const);
+vec4 calcGerstnerWave(float frequency, float QA, float amplitude, vec3 position, vec2 direction,
+                                 float time, float phase_const);
 
 void main(void)
 {

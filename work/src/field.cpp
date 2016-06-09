@@ -181,7 +181,7 @@ void Field::renderFieldShader(WaveGenerator *wave_gen, float time, GLint shader)
 
     glPushMatrix();
     {
-        //glRotatef(-90, 1, 0, 0);
+        glRotatef(-90, 1, 0, 0);
         glDrawArrays(GL_TRIANGLES, 0, m_points->size());    // Draw All Of The Triangles At Once
     }
     glPopMatrix();
