@@ -95,9 +95,11 @@ vTriangle::vTriangle(vVertexPoint *v1, vVertexPoint *v2, vVertexPoint *v3) {
 		centerX += p->getCoords().x;
 		centerY += p->getCoords().y;
 	}
-	centerX = centerX / corners.size();
-	centerY = centerY / corners.size();
+	// centerX = centerX / corners.size();
+	// centerY = centerY / corners.size();
 	
+	centerX = centerX / 3.0f;
+	centerY = centerY / 3.0f;
 
 	this->center = new vVertexPoint(centerX, centerY);
 	center->setPolyCenter(this);
@@ -127,13 +129,16 @@ void vTriangle::updateCenter() {
 	// cout << "Corner size: " << corners.size() << endl;
 	float centerX = 0.0;
 	float centerY = 0.0;
-
+	//if (corners.size() > 3) cout << "Triangle "<< this << " has " << corners.size() << " corners."<<endl;
 	for (vVertexPoint *p : corners) {
 		centerX += p->getCoords().x;
 		centerY += p->getCoords().y;
 	}
 	centerX = centerX / corners.size();
 	centerY = centerY / corners.size();
+
+	// centerX = centerX / 3.0f;
+	// centerY = centerY / 3.0f;
 
 	this->center->setCoords(centerX, centerY);
 }

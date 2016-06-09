@@ -61,6 +61,11 @@ private:
 
 	void rebuildPolyEdges();
 
+	void carveRiverPaths(vector<vector<vVertexPoint*>>);
+
+	void cornerCheck(vector<vTriangle*>);
+	
+
 
 public:
 
@@ -68,6 +73,9 @@ public:
 	VoronoiHandler(int);
 	~VoronoiHandler();
 	vector<vTriangle*> generateTriangles(vector<vVertexPoint*>);
+	
+	void addTriangles(vector<vVertexPoint*>, vector<vTriangle*>);
+
 	vector<vVertexPoint*> relaxTriangles(vector<vVertexPoint*>, vector<vTriangle*>);
 	vector<vTriangle*> generateVPolys(vector<vVertexPoint*>);
 	vector<vVertexPoint*> generatePointSet(int);
@@ -82,7 +90,7 @@ public:
 
 	void sampleImage(int,Image*);
 
-	void changeDensity(int);
+	void upRes();
 	
 	// void newMesh();
 
