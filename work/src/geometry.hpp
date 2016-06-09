@@ -57,6 +57,7 @@ private:
 
 public:
 	Geometry(std::string);
+	Geometry(std::vector<std::vector<cgra::vec3>>);
 	~Geometry();
 
 	void renderGeometry();

@@ -36,6 +36,60 @@ Geometry::Geometry(string filename) {
 	}
 }
 
+Geometry::Geometry(std::vector<std::vector<cgra::vec3>> triangles) {
+	cout << "Building geometry from triangle data" << endl;
+	// Make sure our geometry information is cleared
+	m_points.clear();
+	m_uvs.clear();
+	m_normals.clear();
+	m_triangles.clear();
+
+	// Load dummy points because OBJ indexing starts at 1 not 0
+	m_points.push_back(vec3(0, 0, 0));
+	m_uvs.push_back(vec2(0, 0));
+	m_normals.push_back(vec3(0, 0, 1));
+
+	for (std::vector<cgra::vec3> t : triangles) {
+		vertex v0, v1, v2;
+
+		m_points.push_back(t.at(0));
+		v0.p = m_points.size()-1;
+
+		m_points.push_back(t.at(1));
+		v1.p = m_points.size() - 1;
+
+		m_points.push_back(t.at(2));
+		v2.p = m_points.size() - 1;
+
+		//cout << "Adding " << t.at(0) << ", " << t.at(1) << "," << t.at(2) << endl;
+
+		triangle tri;
+
+		tri.v[0] = v0;
+		tri.v[1] = v1;
+		tri.v[2] = v2;
+
+		m_triangles.push_back(tri);
+
+	}
+	
+
+	cout << "Made geo from data." << endl;
+	cout << m_points.size() - 1 << " points" << endl;
+	cout << m_uvs.size() - 1 << " uv coords" << endl;
+	cout << m_normals.size() - 1 << " normals" << endl;
+	cout << m_triangles.size() << " faces" << endl;
+
+	if (m_normals.size() <= 1) createNormals();
+
+	cout << "Generated " <<m_normals.size()-1 << " normals." << endl;
+
+	if (m_triangles.size() > 0) {
+		createDisplayListPoly();
+	}
+
+}
+
 
 Geometry::~Geometry() { }
 
@@ -204,6 +258,7 @@ void Geometry::createNormals() {
 			//vertex_normal /= float(count);
 			vertex_normal = normalize(vertex_normal);
 		}
+		//cout << "Generated normal: " << vertex_normal << endl;
 		m_normals.push_back(vertex_normal);
 	}
 
@@ -260,6 +315,14 @@ void Geometry::createDisplayListPoly() {
 	}
 	glEnd();
 
+	/*
+	glBegin(GL_TRIANGLES);
+	glNormal3f(0, 0, 1);
+	glVertex3f(10.0, 10.0, 0.0);
+	glVertex3f(10.0, -10.0, 0.0);
+	glVertex3f(-10.0, 10.0, 0.0);
+	glEnd();
+	*/
 	glEndList();
 	cout << "Finished creating Poly Geometry" << endl;
 }
@@ -270,6 +333,5 @@ void Geometry::renderGeometry() {
 
 		//glShadeModel(GL_SMOOTH);
 		glCallList(m_displayListPoly);
-
 }
 
