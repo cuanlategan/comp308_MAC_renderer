@@ -66,6 +66,12 @@ public:
 
 
     void generateCluster(Geometry *geo);
+
+    cgra::vec3 getRandomVertOnFace();
+
+    cgra::vec3 getRandomVertOnFace(cgra::vec3 a);
+
+    cgra::vec3 getRandomVertOnFace(cgra::vec3 a, cgra::vec3 b, cgra::vec3 c);
 };
 
 

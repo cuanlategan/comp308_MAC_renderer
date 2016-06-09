@@ -32,7 +32,20 @@ void Field::BuildVBOs() {
     //m_points->clear(); delete(m_points); m_points = NULL;
     //m_uvs->clear(); delete(m_uvs); m_uvs = NULL;
 }
+cgra::vec3 Field::getRandomVertOnFace(cgra::vec3 a,cgra::vec3 b,cgra::vec3 c){
+    /*float floor = 0, ceiling = 3.5, range = (ceiling - floor);
+    float rnd = floor + (range * rand() / (RAND_MAX + 1.0));*/
+    float floorY = a.y, ceilingY = b.y, rangeY = (ceilingY - floorY);
+    float rndY = floorY + (rangeY * rand() / (RAND_MAX + 1.0));
+
+    float floorX = a.x, ceilingX = b.x, rangeX = (ceilingX - floorX);
+    float rndX = floorX + (rangeX * rand() / (RAND_MAX + 1.0));
+}
+
 void Field::generateCluster(Geometry* geo) {
+
+    srand((unsigned)time(0));
+
 
     for(auto& tri: geo->getTriangles()){
         for(int i=0; i<3; i++){
