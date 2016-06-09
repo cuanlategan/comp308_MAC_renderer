@@ -321,9 +321,24 @@ void initShader() {
 
 // Initializes the blue noise sampler and other useful resources for rendering water
 //
+sampler g_riverSurface(0.01);
 void initWater() {
-    sampler riverSurface(0.01);
-    riverSurface.fillSpace();
+    g_riverSurface.fillSpace();
+}
+
+// Renders the rivers and it's flowing water
+// For now just doing dots
+//
+void drawWater() {
+    vector<vec2> points = g_riverSurface.allPoints();
+    glColor3f(0, 1, 1);
+
+    glBegin(GL_POINTS);
+    for (int i = 0; i < points.size(); i++) {
+        cout << ".";
+        glVertex3f(points[i].x, points[i].y, 0);
+    }
+    glEnd();
 }
 
 
@@ -385,6 +400,7 @@ void render(int width, int height) {
 		// cuan
 		if (draw_geometry) { field.renderField(g_wave_generator, t); }
 		if (draw_points) { field.renderGrid(g_wave_generator, t); }
+        drawWater();
 
 		glPushMatrix();
 		glScalef(10.0, 1.0, 10.0);
@@ -406,6 +422,7 @@ void render(int width, int height) {
 
   
         field.renderFieldShader(g_wave_generator, t, g_phong_sdr);
+        drawWater();
 
         glFlush();
 
@@ -588,6 +605,8 @@ int main(int argc, char **argv) {
     field.generateCluster(GRID_DIMENSION);
     field.generateGrid(GRID_DIMENSION);
 
+
+    initWater();
 
 
     double lastTime = glfwGetTime();

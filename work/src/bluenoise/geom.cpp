@@ -268,7 +268,7 @@ vec2 region::generate() {
     if (!regions.size()) {
         cerr << "Fatal error, sampled from empty region." << endl;
     } else {
-        cerr << "Fatal error, placed point beyond boundaries of this region" << endl;
+        cerr << "Fatal error, placed point " << a << " beyond boundaries, " << area << " of this region" << endl;
     }
     exit(1);
     return vec2(0, 0);

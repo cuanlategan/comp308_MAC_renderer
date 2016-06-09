@@ -24,17 +24,6 @@ sampler::sampler(float radius) {
     fill = new short int[gridSize*gridSize];
 }
 
-// Accessor
-//
-vector<vec2> sampler::allPoints() {
-    vector<vec2> points;
-    for (int i = 0; i < gridSize*gridSize; i++) {
-        for (int j = 0; j < fill[i]; j++) {
-            points.push_back(grid[i][j].P);
-        }
-    }
-    return points;
-}
 
 // Vector utilities
 //
@@ -124,11 +113,24 @@ void sampler::fillSpace() {
         add(vec2(2*randf()-1, 2*randf()-1));
     }
 
-    while (candidates.size()) {
+    int i = 0;
+    while (candidates.size() && i < 100) {
         // TODO weight towards larger surface areas
         int c = rand()%candidates.size();
         cell *candidate = candidates[c];
 
         add(candidate->boundary.generate());
+        i++;
     }
+    cout << endl;
+}
+
+vector<vec2> sampler::allPoints() {
+    vector<vec2> points;
+    for (int i = 0; i < gridSize*gridSize; i++) {
+        for (int j = 0; j < fill[i]; j++) {
+            points.push_back(grid[i][j].P);
+        }
+    }
+    return points;
 }
