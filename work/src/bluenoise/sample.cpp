@@ -27,16 +27,16 @@ sampler::sampler(float radius) {
 
 // Vector utilities
 //
-int find(vector<cell*> haystack, cell *needle) {
+int find(vector<coord> haystack, coord needle) {
     for (int i = 0; i < haystack.size(); i++) {
-        if (haystack[i] == needle) {
+        if (haystack[i].eq(needle)) {
             return i;
         }
     }
     return -1;
 }
 
-void remove(vector<cell*> *list, int i) {
+void remove(vector<coord> *list, int i) {
     list[i] = list[list->size()-1];
     list->pop_back();
 }
@@ -52,12 +52,12 @@ void sampler::getGridXY(vec2 pt, int *gx, int *gy) {
     }
 }
 
-vector<cell*> sampler::findNeighbours(vec2 pt, float dist) {
+vector<coord> sampler::findNeighbours(vec2 pt, float dist) {
     float dist2 = dist*dist;
     int gx, gy, N = int(ceil(dist/gridCellSize));
     if (N>(gridSize*gridSize)) N = gridSize*gridSize;
     
-    vector<cell*> neighbours;
+    vector<coord> neighbours;
     getGridXY(pt, &gx, &gy);
     
     for (int j=-N; j<=N; j++) {
@@ -67,7 +67,7 @@ vector<cell*> sampler::findNeighbours(vec2 pt, float dist) {
             
             for (int k = 0; k < fill[cy*gridSize+cx]; k++) {
                 if (len2(pt - bucket[k].P) < dist2) {
-                    neighbours.push_back(&bucket[k]);
+                    neighbours.push_back(coord(cx, cy, k));
                 }
             }
         }
@@ -79,14 +79,15 @@ vector<cell*> sampler::findNeighbours(vec2 pt, float dist) {
 void sampler::add(vec2 pt) {
     region rgn(pt, R);
     
-    vector<cell*> neighbours = findNeighbours(pt, 8*R);
+    vector<coord> neighbours = findNeighbours(pt, 8*R);
     for (int i = 0; i < neighbours.size(); i++) {
-        cell *neigh = neighbours[i];
+        coord index = neighbours[i];
+        cell *neigh = index.lookup(grid, gridSize);
         rgn.clip(neigh->P, 4*R);
         neigh->boundary.clip(pt, 2*R);
         
-        int c = find(candidates, neigh);
-        if (neigh->boundary.isEmpty() && c != -1) {
+        int c;
+        if (neigh->boundary.isEmpty() && (c = find(candidates, index)) != -1) {
             remove(&candidates, c);
         }
     }
@@ -94,15 +95,13 @@ void sampler::add(vec2 pt) {
     int gx, gy;
     getGridXY(pt, &gx, &gy);
     short int *i = &fill[gy*gridSize + gx];
-    cell *item;
     if (*i < MAX_PER_CELL) {
         grid[gy*gridSize + gx][*i] = cell(pt, region(pt, R));
-        item = &grid[gy*gridSize + gx][*i];
         (*i)++;
     }
     
     if (!rgn.isEmpty()) {
-        candidates.push_back(item);
+        candidates.push_back(coord(gx, gy, (*i)-1));
     }
 }
 
@@ -113,16 +112,17 @@ void sampler::fillSpace() {
         add(vec2(2*randf()-1, 2*randf()-1));
     }
 
+
     int i = 0;
     while (candidates.size() && i < 100) {
         // TODO weight towards larger surface areas
         int c = rand()%candidates.size();
-        cell *candidate = candidates[c];
+        cell *candidate = candidates[c].lookup(grid, gridSize);
 
         add(candidate->boundary.generate());
         i++;
+
     }
-    cout << endl;
 }
 
 vector<vec2> sampler::allPoints() {

@@ -26,6 +26,23 @@ struct cell {
     cell() {}
 };
 
+struct coord {
+    int x, y;
+    short z;
+    
+    coord(int _x, int _y, int _z) {
+        x = _x; y = _y; z = _z;
+    }
+    
+    cell *lookup(cell (*grid)[MAX_PER_CELL], int rowSize) {
+        return &grid[y*rowSize + x][z];
+    }
+    
+    bool eq(coord other) {
+        return x == other.x && y == other.y && z == other.z;
+    }
+};
+
 struct sampler {
     short int *fill;
     cell (*grid)[MAX_PER_CELL];
@@ -33,7 +50,7 @@ struct sampler {
     float gridCellSize;
     float R;
 
-    std::vector<cell*> candidates;
+    std::vector<coord> candidates;
     bool hasPoints;
     
     sampler(float radius);
@@ -41,7 +58,7 @@ struct sampler {
     void fillSpace();
     
 private:
-    std::vector<cell*> findNeighbours(cgra::vec2, float);
+    std::vector<coord> findNeighbours(cgra::vec2, float);
     void add(cgra::vec2);
     void getGridXY(cgra::vec2, int*, int*);
 };

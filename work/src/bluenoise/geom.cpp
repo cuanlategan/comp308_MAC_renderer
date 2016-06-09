@@ -16,7 +16,7 @@ using namespace cgra;
 using namespace std;
 
 /* Utility functions */
-static const float 𝞃 = float(M_PI*2);
+static const float tau = float(M_PI*2);
 
 inline float len2(vec2 v) {
     return v.x*v.x + v.y*v.y;
@@ -34,8 +34,8 @@ inline float range(float lo, float hi) {
     return lo + (hi-lo)*randf();
 }
 
-inline vec2 toVec2(float θ, float l) {
-    return vec2(cos(θ)*l, sin(θ)*l);
+inline vec2 toVec2(float angle, float l) {
+    return vec2(cos(angle)*l, sin(angle)*l);
 }
 
 inline float clamp(float x, float lo, float hi) {
@@ -54,10 +54,10 @@ float integralOfDistToCircle(float x, arc arc) {
     float sin_x = sin(x);
     float dsin_x = arc.d*sin_x;
     float y = clamp(sin_x*arc.d/arc.r, -1, 1);
-    float θ = asin(y);
+    float theta = asin(y);
     
     float k = arc.sign, r = arc.r, d = arc.d;
-    return (r*(r*(x + k*θ) + k*cos(θ)*dsin_x) + d*cos(x)*dsin_x)*0.5;
+    return (r*(r*(x + k*theta) + k*cos(theta)*dsin_x) + d*cos(x)*dsin_x)*0.5;
 }
 
 /* arc methods */
@@ -67,13 +67,13 @@ arc::arc(vec2 _P, float _r, float _sign) {
     sign = _sign;
 }
 
-void arc::cache(vec2 pt, float 𝛼) {
+void arc::cache(vec2 pt, float alpha) {
     vec2 v = P - pt;
     d2 = len2(v);
     d = sqrt(d2);
     r2 = r*r;
-    θ = anglev(v);
-    integralAtStart = integralOfDistToCircle(𝛼 - θ, *this);
+    theta = anglev(v);
+    integralAtStart = integralOfDistToCircle(alpha - theta, *this);
 }
 
 bool arc::eq(arc other) {
@@ -95,24 +95,24 @@ sector::sector(vec2 pt, float _a1, float _a2, arc arc1, arc arc2) {
 }
 
 float sector::_distToCurve(float angle, int index) {
-    float 𝛼 = angle - arcs[index].θ;
-    float sin_𝛼 = sin(𝛼);
-    float t0 = arcs[index].r2 - arcs[index].d2*sin_𝛼*sin_𝛼;
+    float a = angle - arcs[index].theta;
+    float sin_a = sin(a);
+    float t0 = arcs[index].r2 - arcs[index].d2*sin_a*sin_a;
     
     if (t0 < 0) {
-        return arcs[index].d*cos(𝛼);
+        return arcs[index].d*cos(a);
     } else {
-        return arcs[index].d*cos(𝛼) + arcs[index].sign*sqrt(t0);
+        return arcs[index].d*cos(a) + arcs[index].sign*sqrt(t0);
     }
 }
 
 
 // generate() & utils
 //
-float sector::calcAreaToAngle(float 𝛼) {
-    float underInner = integralOfDistToCircle(𝛼 - arcs[0].θ, arcs[0])
+float sector::calcAreaToAngle(float a) {
+    float underInner = integralOfDistToCircle(a - arcs[0].theta, arcs[0])
                 - arcs[0].integralAtStart;
-    float underOuter = integralOfDistToCircle(𝛼 - arcs[1].θ, arcs[1])
+    float underOuter = integralOfDistToCircle(a - arcs[1].theta, arcs[1])
                 - arcs[1].integralAtStart;
 
     return underOuter - underInner;
@@ -136,34 +136,34 @@ float sector::calcAngleForArea(float area) {
 }
 
 vec2 sector::generate() {
-    float 𝛼 = calcAngleForArea(area*randf());
-    float d1 = _distToCurve(𝛼, 0);
-    float d2 = _distToCurve(𝛼, 1);
+    float a = calcAngleForArea(area*randf());
+    float d1 = _distToCurve(a, 0);
+    float d2 = _distToCurve(a, 1);
     float d = sqrt(range(d1*d1, d2*d2));
     
-    return P + toVec2(𝛼, d);
+    return P + toVec2(a, d);
 }
 
 // clip() & utils
 //
-float sector::canonizeAngle(float 𝛼) {
-    float Δ = fmod(𝛼 - a1, 𝞃);
-    if (Δ < 0) Δ += 𝞃;
-    return Δ + a1;
+float sector::canonizeAngle(float a) {
+    float delta = fmod(a - a1, tau);
+    if (delta < 0) delta += tau;
+    return delta + a1;
 }
 
 vec2 sector::distToCircle(float angle, vec2 C, float r) {
     vec2 v = C - P;
     float d2 = len2(v);
-    float θ = anglev(v);
-    float 𝛼 = angle - θ;
-    float sin_𝛼 = sin(𝛼);
-    float x2 = r*r - d2*sin_𝛼*sin_𝛼;
+    float theta = anglev(v);
+    float alpha = angle - theta;
+    float sin_alpha = sin(alpha);
+    float x2 = r*r - d2*sin_alpha*sin_alpha;
     
     if (x2 < 0) {
         return vec2(-10000000000, -10000000000);
     } else {
-        float a = sqrt(d2)*cos(𝛼);
+        float a = sqrt(d2)*cos(alpha);
         float x = sqrt(x);
         return vec2(a-x, a+x);
     }
@@ -176,18 +176,18 @@ void sector::clip(vec2 C, float r, vector<sector> *regions) {
     float d = length(v);
     
     if (r < d) {
-        float θ = anglev(v);
+        float theta = anglev(v);
         float x = sqrt(d*d - r*r);
-        float 𝛼 = asin(r/d);
+        float alpha = asin(r/d);
         
-        float angle = canonizeAngle(θ+𝛼);
+        float angle = canonizeAngle(theta+alpha);
         if (a1 < angle && angle < a2) {
             if (_distToCurve(angle, 0) < x && x < _distToCurve(angle, 1)) {
                 angles.push_back(angle);
             }
         }
         
-        angle = canonizeAngle(θ-𝛼);
+        angle = canonizeAngle(theta-alpha);
         if (a1 < angle && angle < a2) {
             if (_distToCurve(angle, 0) < x && x < _distToCurve(angle, 1)) {
                 angles.push_back(angle);
@@ -249,7 +249,7 @@ void sector::clip(vec2 C, float r, vector<sector> *regions) {
 static const float MIN_AREA = 0.00000001;
 
 region::region(vec2 p, float r) {
-    regions.push_back(sector(p, 0, 𝞃, arc(p, 2*r), arc(p, 4*r)));
+    regions.push_back(sector(p, 0, tau, arc(p, 2*r), arc(p, 4*r)));
     area = regions[0].area;
 }
 

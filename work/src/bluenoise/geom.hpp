@@ -20,7 +20,7 @@ float len2(cgra::vec2);
 
 struct arc {
     cgra::vec2 P;
-    float r, sign, d, θ, integralAtStart;
+    float r, sign, d, theta, integralAtStart;
     float r2, d2;
     
     arc() {} /* quick fix to initialize an arc[2] */
