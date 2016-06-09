@@ -408,7 +408,7 @@ void render(int width, int height) {
        // drawWater();
 
 		glPushMatrix();
-		glScalef(30.0, 1.0, 30.0);
+		glScalef(60.0, 1.0, 60.0);
         glTranslatef(0,0,-1);
 		g_plane->renderGeometry();
 		glPopMatrix();
@@ -605,8 +605,8 @@ int main(int argc, char **argv) {
     //g_wave_generator->addGerstnerWave(2.2,0.1,.1,1.5,vec2(0.f, -1.0f));
     //g_wave_generator->addGerstnerWave(16.2,1.0,.75,2.5,vec2(0.f, 1.0f));
     field = new Field();
-    field->generateCluster(GRID_DIMENSION);
-    //field->generateCluster(g_plane);
+    //field->generateCluster(GRID_DIMENSION);
+    field->generateCluster(g_plane);
     field->generateGrid(GRID_DIMENSION);
 
 

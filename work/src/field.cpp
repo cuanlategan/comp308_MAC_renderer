@@ -38,8 +38,8 @@ void Field::generateCluster(Geometry* geo) {
         for(int i=0; i<3; i++){
             cgra::vec3 triPoint = geo->getPoints().at(tri.v[i].p);
             glScalef(10.0, 1.0, 10.0);
-            triPoint.x *= 30;
-            triPoint.z *= 30;
+            triPoint.x *= 60;
+            triPoint.z *= 60;
             cgra::vec3 rotatedPoint(triPoint.x,triPoint.z,triPoint.y);
 
             Grass grass(rotatedPoint);
