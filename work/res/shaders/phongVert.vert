@@ -36,7 +36,7 @@ void main(void)
       //vec4 result = calcGerstnerWave(freq, QA,dir,phase_con);
       vec4 result = calcGerstnerWave(freq, QA,amplitude,attr_center, dir, time, phase_con);
 
-      gl_Position = gl_ModelViewProjectionMatrix * ((result*0.1) +gl_Vertex);
+      gl_Position = gl_ModelViewProjectionMatrix * ((result*0.6) +gl_Vertex);
       //gl_Position = gl_ModelViewProjectionMatrix * (result +gl_Vertex);
 
    }
