@@ -399,11 +399,11 @@ void render(int width, int height) {
 
         t+=0.02;
         if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
-
 		// cuan
 		if (draw_geometry) { field.renderField(g_wave_generator, t); }
 		if (draw_points) { field.renderGrid(g_wave_generator, t); }
-        drawWater();
+
+        //drawWater();
 
 		glPushMatrix();
 		glScalef(10.0, 1.0, 10.0);
@@ -417,20 +417,22 @@ void render(int width, int height) {
 
     else {
 
+        glPushMatrix();
+        glScalef(10.0, 1.0, 10.0);
+        g_plane->renderGeometry();
+        glPopMatrix();
 
         glUseProgram(g_phong_sdr);
-
         t+=0.02;
         if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
-
-  
         field.renderFieldShader(g_wave_generator, t, g_phong_sdr);
-        drawWater();
+        glUseProgram(0);
 
-        glFlush();
+        //drawWater();
+
 
         // Unbind our shader
-        glUseProgram(0);
+        glFlush();
     }
 
 
@@ -610,7 +612,7 @@ int main(int argc, char **argv) {
 
 
     cout << "HELLO" << endl;
-    initWater();
+    //initWater();
     cout << "WORLD" << endl;
 
 
