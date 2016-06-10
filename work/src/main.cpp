@@ -18,34 +18,29 @@
 #include <string>
 #include <stdexcept>
 
-
-#include "cgra_geometry.hpp"
 #include "cgra_math.hpp"
-#include "simple_image.hpp"
-#include "simple_shader.hpp"
 #include "opengl.hpp"
 #include "geometry.hpp"
-#include "define.h"
-#include "cuan_define.h"
-#include "wave_generator.h"
-#include "field.h"
 #include "RiverHandler.h"
-
-#include "bluenoise/sample.hpp"
 
 using namespace std;
 using namespace cgra;
 
 // Window
 //
-GLFWwindow *g_window;
+GLFWwindow* g_window;
 
+bool showWindow = false;
+bool wireframe = false;
 
 // Projection values
 //
-float g_fovy = 60.0;
+float g_fovy = 20.0;
 float g_znear = 0.1;
 float g_zfar = 1000.0;
+
+// Current rotation amount
+float g_rotation = 0.0;
 
 
 // Mouse controlled Camera values
@@ -56,75 +51,94 @@ float g_pitch = 0;
 float g_yaw = 0;
 float g_zoom = 1.0;
 
-vec3 g_camera_eye(0.f,0.f,0.f);
 
-// Values and fields to showcase the use of shaders
-// Remove when modifying main.cpp for Assignment 3
+// Geometry loader and drawer
 //
-bool g_useShader = true;
-GLuint g_phong_sdr = 0;
-GLuint g_grass_tex = 0;
-
-// Rivermap texture
-GLuint g_rivermap = 0;
-
-// Objects to be rendered
-WaveGenerator *g_wave_generator;
-Field* field = nullptr;
-Geometry *g_plane = nullptr;
-
-// Marks River Gen
-RiverHandler *g_riverHandler;
-
-
-float t = 0.f;
-
-bool draw_lights = true;
-bool draw_ambiant_light = true;
-bool draw_spot_light = true;
-bool draw_directional_light = true;
-bool draw_point_light = true;
-
-bool draw_points = false;
-bool draw_geometry = true;
-
-float spot_cutoff = 6.5f;
-float table_rotation = 0.f;
-bool rotate_table = false;
+Geometry *g_geometry = nullptr;
+RiverHandler rHandler;
 
 
 
+
+//-------------------------------------------------------------
+// [Assignment 1] :
+// The following callback functions are used for processing
+// user input. Modify in EITHER of the following ways.
+//
+// Modify keyCallback so that when the 'r' key is pressed
+// rotate the camera around the model horizontally.
+//
+// or
+//
+// Modify the mouseButtonCallback and cursorPosCallback
+// functions so when the left mouse button is pressed and
+// dragged along the screen horizontally, the camera also
+// roates around the model horizontally.
+//-------------------------------------------------------------
 
 // Mouse Button callback
 // Called for mouse movement event on since the last glfwPollEvents
 //
-void cursorPosCallback(GLFWwindow *win, double xpos, double ypos) {
-	// cout << "Mouse Movement Callback :: xpos=" << xpos << "ypos=" << ypos << endl;
+void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
+
 	if (g_leftMouseDown) {
 		g_yaw -= g_mousePosition.x - xpos;
 		g_pitch -= g_mousePosition.y - ypos;
-
 	}
 	g_mousePosition = vec2(xpos, ypos);
 }
 
+//-------------------------------------------------------------
+// [Assignment 1] :
+// Modify the mouseCallback function in main.cpp so that when
+// the right mouse button is clicked, the wireframe mode on
+// Geometry is toggled on and off.
+//-------------------------------------------------------------
 
 // Mouse Button callback
 // Called for mouse button event on since the last glfwPollEvents
 //
 void mouseButtonCallback(GLFWwindow *win, int button, int action, int mods) {
+
 	// cout << "Mouse Button Callback :: button=" << button << "action=" << action << "mods=" << mods << endl;
-	if (button == GLFW_MOUSE_BUTTON_LEFT)
-		g_leftMouseDown = (action == GLFW_PRESS);
-	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-		if (g_useShader) {
-			g_useShader = false;
-			cout << "Using the default OpenGL pipeline" << endl;
-		}
-		else {
-			g_useShader = true;
-			cout << "Using a shader" << endl;
-		}
+
+	switch(action) {
+
+		case GLFW_PRESS:
+
+			switch(button) {
+
+				case GLFW_MOUSE_BUTTON_RIGHT:
+					showWindow = true;
+					break;
+
+				case GLFW_MOUSE_BUTTON_LEFT:
+					cout << "Left Mouse Clicked" << endl;
+					double xpos, ypos;
+					glfwGetCursorPos(win,&xpos,&ypos);
+					g_mousePosition = vec2(xpos,ypos);
+					g_leftMouseDown = !g_leftMouseDown;
+					break;
+
+				default:
+					break;
+			}
+			break;
+		case GLFW_RELEASE:
+
+			switch(button) {
+
+				case GLFW_MOUSE_BUTTON_LEFT:
+					cout << "Left Mouse Released" << endl;
+					double xpos, ypos;
+					glfwGetCursorPos(win,&xpos,&ypos);
+					g_mousePosition = vec2(xpos,ypos);
+					g_leftMouseDown = !g_leftMouseDown;
+					break;
+
+				default:
+					break;
+			}
 	}
 }
 
@@ -142,92 +156,24 @@ void scrollCallback(GLFWwindow *win, double xoffset, double yoffset) {
 // Called for every key event on since the last glfwPollEvents
 //
 void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
-	//cout << "Key Callback :: key=" << key << "scancode=" << scancode
-	//<< "action=" << action << "mods=" << mods << endl;
+	cout << "Key Callback :: key=" << key << "scancode=" << scancode << "action=" << action << "mods=" << mods << endl;
 
-	if (key == 49 && action == 1) { // key 1
-		draw_ambiant_light = !draw_ambiant_light;
-		cout << "ambiant: " << draw_ambiant_light << endl;
+	switch(key) {
+		case 82:
+			switch(action) {
+				case GLFW_REPEAT:
+					g_rotation++;
+					if (g_rotation == 360.0){g_rotation = 0;}
+				default:
+					break;
+			}
+		case 32:
+			if (action = 1) wireframe = !wireframe;
+		default:
+			break;
 	}
-	if (key == 50 && action == 1) { // key 2
-		draw_point_light = !draw_point_light;
-		cout << "draw_point_light: " << draw_point_light << endl;
-	}
-	if (key == 51 && action == 1) { // key 3
-		draw_directional_light = !draw_directional_light;
-		cout << "draw_directional_light: " << draw_directional_light << endl;
-	}
-	if (key == 52 && action == 1) { // key 4
-		draw_spot_light = !draw_spot_light;
-		cout << "draw_spot_light: " << draw_spot_light << endl;
-	}
-	if (key == 70 && action == 1) { // key f
-		draw_lights = !draw_lights;
-	}
-	if (key == 69 && action == 1) { // key e
-		draw_points = !draw_points;
-		cout << "draw_points: " << draw_points << endl;
-	}
-	if (key == 81 && action == 1) { // key q
-		draw_geometry = !draw_geometry;
-		cout << "draw_geometry: " << draw_geometry << endl;
-	}
-	if (key == 84) { // key t
-
-	}
-	if (key == 87) { // key w
-		//g_camera_eye.z += 0.5f;
-
-		g_camera_eye.x += float(sin(radians(g_yaw)));
-		g_camera_eye.z -= float(cos(radians(g_yaw)));
-		g_camera_eye.y -= float(sin(radians(g_pitch)));
-
-	}
-	if (key == 65) { // key a
-		//g_camera_eye.x += 0.5f;
-
-		g_camera_eye.x -= float(cos(radians(g_yaw))) * 0.2;
-		g_camera_eye.z -= float(sin(radians(g_yaw))) * 0.2;
-	}
-	if (key == 83) { // key s
-		//g_camera_eye.z -= 0.5f;
-
-		g_camera_eye.x -= float(sin(radians(g_yaw)));
-		g_camera_eye.z += float(cos(radians(g_yaw)));
-		g_camera_eye.y += float(sin(radians(g_pitch)));
-	}
-	if (key == 68) { // key d
-		//g_camera_eye.x -= 0.5f;
-
-		g_camera_eye.x += float(cos(radians(g_yaw))) * 0.2;
-		g_camera_eye.z += float(sin(radians(g_yaw))) * 0.2;
-	}
-	if (key == 341) { // key ctrl
-
-	}
-	if (key == 32) { // key spacebar
-
-	}
-	if (key == 265) { // key up-arrow
-
-	}
-	if (key == 264) { // key down-arrow
-
-	}
-	if (key == 263) { // key left-arrow
-
-	}
-	if (key == 262) { // key right-arrow
-
-	}
-
-	//TODO Clean Up
-	/*vec4 v(light_1_direction[0], light_1_direction[1], light_1_direction[2], light_1_direction[3]);
-    //vec3 v(light_1_direction[0],light_1_direction[1],light_1_direction[2]);
-    v = normalize(v);
-    cout << "l1 pos: " << light_1_position[0] << " " << light_1_position[1] << " " << light_1_position[2] << "   v: " <<
-    v << endl;*/
 }
+
 
 // Character callback
 // Called for every character input event on since the last glfwPollEvents
@@ -239,111 +185,22 @@ void charCallback(GLFWwindow *win, unsigned int c) {
 
 
 // Sets up where and what the light is
-// Called once on start up
 //
-void initLight() {
+void setupLight() {
+	// No transform for the light
+	// makes it move realitive to camera
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
-	if (draw_ambiant_light) {
-		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, light_0_ambient);
-		//glLightfv(GL_LIGHT0, GL_POSITION, light_0_position); //keep default z dir //TODO
-		glLightfv(GL_LIGHT0, GL_DIFFUSE, light_0_diffintensity);
-		glLightfv(GL_LIGHT0, GL_AMBIENT, light_0_ambient);
-		glEnable(GL_LIGHT0);
-	} else { glDisable(GL_LIGHT0); }
+	vec4 direction(0.0, 0.0, 1.0, 0.0);
+	vec4 diffuse(0.7, 0.7, 0.7, 1.0);
+	vec4 ambient(0.2, 0.2, 0.2, 1.0);
 
-	if (draw_spot_light) {
-		glLightfv(GL_LIGHT1, GL_POSITION, light_1_position);
-		glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, light_1_direction);
-		glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, spot_cutoff);
-		glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 2.5f);
-		glLightfv(GL_LIGHT1, GL_DIFFUSE, light_1_diffintensity);
-		glLightfv(GL_LIGHT1, GL_AMBIENT, light_1_ambient);
-		glLightfv(GL_LIGHT1, GL_SPECULAR, light_1_specular);
-		glEnable(GL_LIGHT1);
-	} else { glDisable(GL_LIGHT1); }
+	glLightfv(GL_LIGHT0, GL_POSITION, direction.dataPointer());
+	glLightfv(GL_LIGHT0, GL_DIFFUSE,  diffuse.dataPointer());
+	glLightfv(GL_LIGHT0, GL_AMBIENT,  ambient.dataPointer());
 
-	if (draw_directional_light) {
-		//glLightfv(GL_LIGHT2, GL_POSITION, light_1_position);
-		glLightfv(GL_LIGHT2, GL_SPOT_DIRECTION, light_2_direction);
-		glLightfv(GL_LIGHT2, GL_DIFFUSE, light_2_diffintensity);
-		glLightfv(GL_LIGHT2, GL_AMBIENT, light_2_ambient);
-		glLightfv(GL_LIGHT2, GL_SPECULAR, light_2_specular);
-		glEnable(GL_LIGHT2);
-	} else { glDisable(GL_LIGHT2); }
-
-	if (draw_point_light) {
-		glLightfv(GL_LIGHT3, GL_POSITION, light_3_position);
-		glLightfv(GL_LIGHT3, GL_DIFFUSE, light_3_diffintensity);
-		glLightfv(GL_LIGHT3, GL_AMBIENT, light_3_ambient);
-		glLightfv(GL_LIGHT3, GL_SPECULAR, light_3_specular);
-		glEnable(GL_LIGHT3);
-	} else { glDisable(GL_LIGHT3); }
-
-}
-
-
-// An example of how to load a texure from a hardcoded location
-//
-void initTexture() {
-
-
-
-	Image tex_grass("./work/res/textures/tall-grass3.png");
-	glGenTextures(1, &g_grass_tex); // Generate texture ID
-
-	glBindTexture(GL_TEXTURE_2D, g_grass_tex); // Bind it as a 2D texture
-	// Finnaly, actually fill the data into our texture
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, tex_grass.w, tex_grass.h, tex_grass.glFormat(), GL_UNSIGNED_BYTE,
-					  tex_grass.dataPointer());
-
-	//glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,tex_grass.w,tex_grass.h,0,GL_RGBA,GL_UNSIGNED_BYTE,tex_grass.dataPointer());
-
-	// Setup sampling strategies
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-}
-
-
-
-
-// An example of how to load a shader from a hardcoded location
-//
-void initShader() {
-	// To create a shader program we use a helper function
-	// We pass it an array of the types of shaders we want to compile
-	// and the corrosponding locations for the files of each stage
-	g_phong_sdr = makeShaderProgramFromFile({GL_VERTEX_SHADER, GL_FRAGMENT_SHADER},
-											{"./work/res/shaders/phongVert.vert", "./work/res/shaders/phongFrag.frag"});
-	glBindAttribLocationARB(g_phong_sdr,6,"attr_center");
-	glLinkProgram(g_phong_sdr);
-}
-
-// Initializes the blue noise sampler and other useful resources for rendering water
-//
-sampler *g_riverSurface;
-void initWater() {
-	g_riverSurface = new sampler(0.01);
-	cout << "." << endl;
-	g_riverSurface->fillSpace();
-	cout << "!" << endl;
-}
-
-// Renders the rivers and it's flowing water
-// For now just doing dots
-//
-void drawWater() {
-	vector<vec2> points = g_riverSurface->allPoints();
-	glColor3f(0, 1, 1);
-
-	glBegin(GL_POINTS);
-	for (int i = 0; i < points.size(); i++) {
-		cout << ".";
-		glVertex3f(points[i].x, points[i].y, 0);
-	}
-	glEnd();
+	glEnable(GL_LIGHT0);
 }
 
 
@@ -359,170 +216,87 @@ void setupCamera(int width, int height) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	// YOUR CODE GOES HERE
+	glTranslatef(0, 0, -5 * g_zoom);
 	glRotatef(g_pitch, 1, 0, 0);
 	glRotatef(g_yaw, 0, 1, 0);
-	glTranslatef(-g_camera_eye.x,-g_camera_eye.y, -g_camera_eye.z);
-
-
-
-	//cout << "g_pitch: " << g_pitch << "  g_yaw: " << g_yaw << endl;
 }
 
 
-
-
-void drawLights();
-
-// Draw function
+// Render one frame to the current window given width and height
 //
 void render(int width, int height) {
 
+	if (showWindow) {
+		rHandler.drawAll();
+		showWindow = false;
+	}
+
+	// Set viewport to be the whole window
+	glViewport(0, 0, width, height);
+
+	// Setup light
+	setupLight();
+
+	// Setup camera
+	setupCamera(width, height);
+
 	// Grey/Blueish background
-	glClearColor(0.3f, 0.3f, 0.4f, 1.0f);
+	glClearColor(0.3f,0.3f,0.4f,1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 	// Enable flags for normal rendering
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_NORMALIZE);
+	glEnable(GL_COLOR_MATERIAL);
+
+	// Set the current material (for all objects) to red
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	glColor3f(1.0f, 0.0f, 0.0f); //red
+	if (wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	// Render geometry
+	glPushMatrix(); {
+
+		glScalef(10.0, 1.0, 10.0);
+		glTranslatef(-0.5, 0, -0.5);
+		g_geometry->renderGeometry();
 
 
-	setupCamera(width, height);
+		//glBegin(GL_TRIANGLES);
+		//glNormal3f(0, 0, 1);
+		//glVertex3f(10.0, 10.0, 0.0);
+		//glVertex3f(10.0, -10.0, 0.0);
+		//glVertex3f(-10.0, 10.0, 0.0);
+		//glEnd();
+		//glFlush();
 
-	// Without shaders
-	// Uses the default OpenGL pipeline
-	if (!g_useShader) {
-
-
-
-
-
-
-		t+=0.02;
-		if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
-
-		// cuan
-		if (draw_geometry) { field->renderField(g_wave_generator, t); }
-		if (draw_points) { field->renderGrid(g_wave_generator, t); }
-		// drawWater();
-
-		glPushMatrix();
-		glScalef(60.0, 1.0, 60.0);
-		glTranslatef(0,0,-1);
-		g_plane->renderGeometry();
-		glPopMatrix();
-
-		glFlush();
-
-	}
-
-
-	else {
-		glPushMatrix();
-		glScalef(60.0, 1.0, 60.0);
-		glTranslatef(0,0,-1);
-		g_plane->renderGeometry();
-		glPopMatrix();
-
-		glUseProgram(g_phong_sdr);
-
-		t+=0.02;
-		if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
-
-
-		field->renderFieldShader(g_wave_generator, t, g_phong_sdr);
-		// drawWater();
-
-		glFlush();
-
-		// Unbind our shader
-		glUseProgram(0);
-	}
-
-
-
-	if (draw_lights) {
-		drawLights();
-	}
+	}glPopMatrix();
 
 	// Disable flags for cleanup (optional)
-	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_NORMALIZE);
-	//glDisable(GL_BLEND);
+	glDisable(GL_COLOR_MATERIAL);
 }
-
-
-void drawLights() {
-
-	glPushMatrix();
-	{
-		glColor3f(1.f, 1.f, 1.f);
-		glMaterialfv(GL_FRONT, GL_AMBIENT, full_white);
-
-		//rotate cone
-		glPushMatrix();
-		{
-			vec3 li(light_1_direction[0],
-					light_1_direction[1],
-					light_1_direction[2]
-			);
-
-			li = normalize(li);
-			vec3 z(0.f, 0.f, 1.f);
-			float theta = degrees(acos(dot(z, li))); //angle between bone and z-axis
-			vec3 rotationAxis = cross(z, li); // normal of bone and z-axis
-			glTranslatef(light_1_position[0], light_1_position[1], light_1_position[2]);
-			glRotatef(theta, rotationAxis.x, rotationAxis.y, rotationAxis.z); // rotate around normal
-
-			// spot light cutoff shade
-			float r = 10.f * tan(radians(spot_cutoff));
-			GLUquadricObj *theQuadric;
-			theQuadric = gluNewQuadric();
-			gluQuadricDrawStyle(theQuadric, GLU_LINE);
-			gluQuadricNormals(theQuadric, GLU_SMOOTH);
-			gluCylinder(theQuadric, 0.f, r, 5.f, 10, 1);
-			gluDeleteQuadric(theQuadric);
-
-			glPopMatrix();
-		}
-
-		glTranslatef(light_1_position[0], light_1_position[1], light_1_position[2]);
-
-
-		glPushMatrix();
-		{
-			glTranslatef(0.f, .8f, 0.f);
-			glRotatef(90, 1.f, 0.f, 0.f);
-			cgraCylinder(.1, .1, 1.6f);
-		}
-		glPopMatrix();
-
-		cgraSphere(.35);
-
-		glBegin(GL_LINES);
-		{
-			glVertex3f(0, 0, 0);
-			glVertex3f(light_1_direction[0]*1000.f, light_1_direction[1]*1000.f, light_1_direction[2]*1000.f);
-		}
-		glEnd();
-	}
-	glPopMatrix();
-}
-
-
 
 
 // Forward decleration for cleanliness (Ignore)
-void APIENTRY debugCallbackARB(GLenum, GLenum, GLuint, GLenum, GLsizei, const GLchar *, GLvoid *);
+void APIENTRY debugCallbackARB(GLenum, GLenum, GLuint, GLenum, GLsizei, const GLchar*, GLvoid*);
 
 
 //Main program
 //
 int main(int argc, char **argv) {
 
+
+	// Check argument list
+	/*
+	if(argc != 2){
+		cout << "Obj filename expected, eg:" << endl << "    ./a1 teapot.obj" << endl;
+		abort(); // Unrecoverable error
+	}
+	*/
 
 
 	// Initialize the GLFW library
@@ -536,7 +310,7 @@ int main(int argc, char **argv) {
 	glfwGetVersion(&glfwMajor, &glfwMinor, &glfwRevision);
 
 	// Create a windowed mode window and its OpenGL context
-	g_window = glfwCreateWindow(640, 480, "Hello World", nullptr, nullptr);
+	g_window = glfwCreateWindow(640, 480, "COMP308 Assignment 1", nullptr, nullptr);
 	if (!g_window) {
 		cerr << "Error: Could not create GLFW window" << endl;
 		abort(); // Unrecoverable error
@@ -548,7 +322,7 @@ int main(int argc, char **argv) {
 
 
 
-	//Initialize GLEW
+	// Initialize GLEW
 	// must be done after making a GL context current (glfwMakeContextCurrent in this case)
 	glewExperimental = GL_TRUE; // required for full GLEW functionality for OpenGL 3.0+
 	GLenum err = glewInit();
@@ -583,64 +357,51 @@ int main(int argc, char **argv) {
 		glDebugMessageCallbackARB(debugCallbackARB, nullptr);
 		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
 		cout << "GL_ARB_debug_output callback installed" << endl;
-	}
-	else {
+	} else {
 		cout << "GL_ARB_debug_output not available. No worries." << endl;
 	}
 
-	initLight();
-	initTexture();
-	initShader();
+	/*
+	glBegin(GL_TRIANGLES);
+	glNormal3f(0, 0, 1);
+	glVertex3f(10.0, 10.0, 0.0);
+	glVertex3f(10.0, -10.0, 0.0);
+	glVertex3f(-10.0, 10.0, 0.0);
+	glEnd();
+	*/
+
+	vector<vec3> tData;
+	vector<vector<vec3>> triData;
+
+	vec3 p0(10.0, 10.0, 0.0);
+	vec3 p1(10.0, -10.0, 0.0);
+	vec3 p2(-10.0, 10.0, 0.0);
+
+	tData.push_back(p0);
+	tData.push_back(p1);
+	tData.push_back(p2);
+
+	triData.push_back(tData);
 
 
-	// Initialize Geometry/Material/Lights
-	// YOUR CODE GOES HERE
-	// ...
 
-	g_riverHandler = new RiverHandler();
-	//g_riverHandler->drawAll();
-
-	g_plane = g_riverHandler->makeGeo();
-
-
-	g_wave_generator = new WaveGenerator();
-	g_wave_generator->addGerstnerWave(4.567, 0.3, 0.8, 1.5, vec2(-.3f, 1.f));
-	//g_wave_generator->addGerstnerWave(7.685,0.2,.8,1.5,vec2(-.35f, 0.8f));
-	//g_wave_generator->addGerstnerWave(2.2,0.1,.1,1.5,vec2(0.f, -1.0f));
-	//g_wave_generator->addGerstnerWave(16.2,1.0,.75,2.5,vec2(0.f, 1.0f));
-	field = new Field();
-	//field->generateCluster(GRID_DIMENSION);
-	field->generateCluster(g_plane);
-	field->generateGrid(GRID_DIMENSION);
+	// Initialize out scene
+	//g_geometry = new Geometry(argv[1]);
+	// g_geometry = new Geometry(triData);
+	g_geometry = rHandler.makeGeo();
+	//g_geometry = rHandler.getGeo();
+	// g_geometry = new Geometry("./work/res/assets/bunny.obj");
 
 
-	cout << "HELLO" << endl;
-	//initWater();
-	cout << "WORLD" << endl;
-
-
-	double lastTime = glfwGetTime();
-	int nbFrames = 0;
 
 	// Loop until the user closes the window
 	while (!glfwWindowShouldClose(g_window)) {
-
-		// Measure speed
-		double currentTime = glfwGetTime();
-		nbFrames++;
-		if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1 sec ago
-			// printf and reset timer
-			printf("%f ms/frame: %f\n", 1000.0/double(nbFrames), double(nbFrames));
-			nbFrames = 0;
-			lastTime += 1.0;
-		}
 
 		// Make sure we draw to the WHOLE window
 		int width, height;
 		glfwGetFramebufferSize(g_window, &width, &height);
 
 		// Main Render
-		initLight();
 		render(width, height);
 
 		// Swap front and back buffers
@@ -658,76 +419,75 @@ int main(int argc, char **argv) {
 
 
 
-//--------------------------------------------------------------------------
+//-------------------------------------------------------------
 // Fancy debug stuff
-//--------------------------------------------------------------------------
+//-------------------------------------------------------------
 
 // function to translate source to string
 string getStringForSource(GLenum source) {
 
-	switch (source) {
+	switch(source) {
 		case GL_DEBUG_SOURCE_API:
-			return ("API");
+			return("API");
 		case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
-			return ("Window System");
+			return("Window System");
 		case GL_DEBUG_SOURCE_SHADER_COMPILER:
-			return ("Shader Compiler");
+			return("Shader Compiler");
 		case GL_DEBUG_SOURCE_THIRD_PARTY:
-			return ("Third Party");
+			return("Third Party");
 		case GL_DEBUG_SOURCE_APPLICATION:
-			return ("Application");
+			return("Application");
 		case GL_DEBUG_SOURCE_OTHER:
-			return ("Other");
+			return("Other");
 		default:
-			return ("n/a");
+			return("n/a");
 	}
 }
 
 // function to translate severity to string
 string getStringForSeverity(GLenum severity) {
 
-	switch (severity) {
+	switch(severity) {
 		case GL_DEBUG_SEVERITY_HIGH:
-			return ("HIGH!");
+			return("HIGH!");
 		case GL_DEBUG_SEVERITY_MEDIUM:
-			return ("Medium");
+			return("Medium");
 		case GL_DEBUG_SEVERITY_LOW:
-			return ("Low");
+			return("Low");
 		default:
-			return ("n/a");
+			return("n/a");
 	}
 }
 
 // function to translate type to string
 string getStringForType(GLenum type) {
-	switch (type) {
+	switch(type) {
 		case GL_DEBUG_TYPE_ERROR:
-			return ("Error");
+			return("Error");
 		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-			return ("Deprecated Behaviour");
+			return("Deprecated Behaviour");
 		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-			return ("Undefined Behaviour");
+			return("Undefined Behaviour");
 		case GL_DEBUG_TYPE_PORTABILITY:
-			return ("Portability Issue");
+			return("Portability Issue");
 		case GL_DEBUG_TYPE_PERFORMANCE:
-			return ("Performance Issue");
+			return("Performance Issue");
 		case GL_DEBUG_TYPE_OTHER:
-			return ("Other");
+			return("Other");
 		default:
-			return ("n/a");
+			return("n/a");
 	}
 }
 
 // actually define the function
-void APIENTRY debugCallbackARB(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei, const GLchar *message,
-							   GLvoid *) {
-	if (severity != GL_DEBUG_SEVERITY_NOTIFICATION) return;
+void APIENTRY debugCallbackARB(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei, const GLchar* message, GLvoid*) {
+	if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) return;
 
 	cerr << endl; // extra space
 
 	cerr << "Type: " <<
 	getStringForType(type) << "; Source: " <<
-	getStringForSource(source) << "; ID: " << id << "; Severity: " <<
+	getStringForSource(source) <<"; ID: " << id << "; Severity: " <<
 	getStringForSeverity(severity) << endl;
 
 	cerr << message << endl;
