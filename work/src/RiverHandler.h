@@ -27,7 +27,7 @@ private:
 	int waterScalar = 10;
 	int widthScalar = 10;
 	int zScalar = 2;
-	int smoothPasses = 1;
+	int smoothPasses = 0;
 
 	int density = 50;
 	// int finalDensity = 600 - density - (numberOfRivers * (density / 4));

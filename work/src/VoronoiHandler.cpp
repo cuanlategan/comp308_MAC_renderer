@@ -1,6 +1,4 @@
-#include <list>
 #include "VoronoiHandler.h"
-
 
 // ############################################################
 // Voronoi Handler Class

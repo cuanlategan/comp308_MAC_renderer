@@ -209,13 +209,15 @@ vector<vVertexPoint*> splineHandler::makeRiverPointSpline(vector<vVertexPoint*> 
 
 	splinePoints =  calculateSpline(controlPoints);
 
-	
-
+	cout << "Generating river spline: " << endl;
+	cout << riverPoints.size() << " control points" << endl;
+	cout << "Should be " << riverPoints.size() + ((riverPoints.size() - 1)*numberOfSamples) << " final points" << endl;
 
 	for (int x = 1; x <= riverPoints.size()-1; x++) {
 		finalPoints.push_back(riverPoints.at(x-1));
 		for (int y = 1; y <= numberOfSamples; y++) {
 			vVertexPoint *p = new vVertexPoint(splinePoints.at(x + y).x, splinePoints.at(x + y).y);
+			p->setRiver(true);
 			p->setWater(splinePoints.at(x + y).z);
 			p->setScreenCoords(1024);
 			finalPoints.back()->setDownstream(p);
@@ -224,6 +226,6 @@ vector<vVertexPoint*> splineHandler::makeRiverPointSpline(vector<vVertexPoint*> 
 		finalPoints.back()->setDownstream(riverPoints.back());
 		finalPoints.push_back(riverPoints.back());
 	}
-	
+	cout << "Actual final points: " << finalPoints.size() << endl;
 	return finalPoints;
 }

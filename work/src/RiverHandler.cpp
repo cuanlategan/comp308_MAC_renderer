@@ -102,9 +102,9 @@ vector<vector<vVertexPoint*>> RiverHandler::makeRivers(int numberOfRivers, vecto
 		}
 		*/
 		vector<vVertexPoint*> newRiver = makeRiverPath(source);
-		//vector<vVertexPoint*> newRiverSpline = splineMaker->makeRiverPointSpline(newRiver);
-		rivers.push_back(newRiver);
-		//rivers.push_back(newRiverSpline);
+		vector<vVertexPoint*> newRiverSpline = splineMaker->makeRiverPointSpline(newRiver);
+		// rivers.push_back(newRiver);
+		rivers.push_back(newRiverSpline);
 	}
 	cout << "Made " << rivers.size() << " rivers" << endl;
 	return rivers;
@@ -115,9 +115,9 @@ vector<vVertexPoint*> RiverHandler::makeRiverPath(vVertexPoint* source) {
 
 	source->setRiver(true);
 	source->setWater(startWater);
-	cout << "Old zvalue: " << source->getZValue() << endl;
+	//cout << "Old zvalue: " << source->getZValue() << endl;
 	source->setZValue(source->getZValue() - (source->getWater()*waterScalar));
-	cout << "New zvalue: " << source->getZValue() << endl;
+	//cout << "New zvalue: " << source->getZValue() << endl;
 
 	for (vTriangle *n : source->getPolyCenter()->getNeighbours()) {
 		n->setRiver(true, startWater);
@@ -237,7 +237,7 @@ void RiverHandler::drawAll() {
 	//drawPoints(riverPoints, &pointDisplay, cYellow, cRed, radius);
 	drawPolygons(graph->getTriangles(), &pointDisplay, cGrey, cRed, radius);
 	drawRivers(rivers, &pointDisplay, cWhite, cWhite,radius);
-	//drawRiverSplines(rivers, &pointDisplay, cWhite, cWhite, radius);
+	drawRiverSplines(rivers, &pointDisplay, cWhite, cWhite, radius);
 
 	CImgDisplay draw_disp(pointDisplay, "Raw Mesh");
 	while (!draw_disp.is_closed()) {
@@ -279,7 +279,7 @@ void RiverHandler::drawRivers(vector<vector<vVertexPoint*>> riverSet, CImg<unsig
 				int p1y = r->getDownstream()->screenCoords.y;
 				int points[4] = { p0x, p0y, p1x, p1y };
 				//cout << "Riverline: " << points << endl;
-				pointDisplay->draw_line(points[0], points[1], points[2], points[3], lineColor);
+				// pointDisplay->draw_line(points[0], points[1], points[2], points[3], lineColor);
 			}
 		}
 	}
@@ -312,7 +312,7 @@ void RiverHandler::drawRiverSplines(vector<vector<vVertexPoint*>> riverSet, CImg
 				int p1x = p1.x * (imageSize - 1);
 				int p1y = p1.y * (imageSize - 1);
 
-				pointDisplay->draw_line(p0x, p0y, p1x, p1y, lineColor);
+				//pointDisplay->draw_line(p0x, p0y, p1x, p1y, lineColor);
 
 			}
 	
