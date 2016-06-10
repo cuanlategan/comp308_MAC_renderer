@@ -9,9 +9,9 @@ VoronoiHandler::VoronoiHandler() {
 }
 
 // Constructor
-VoronoiHandler::VoronoiHandler(int density) {
+VoronoiHandler::VoronoiHandler(int density, Image *heightmap) {
 	this->triVertices = generatePointSet(density);
-	this->triangles = generateTriangles(triVertices);
+	this->triangles = generateTriangles(triVertices, heightmap);
 	this->triEdges = findEdges(triangles);
 	this->borderTris = findBorders(triangles);
 	cout << "Generated " << triangles.size() << " triangles, with ";
@@ -101,6 +101,17 @@ VoronoiHandler::~VoronoiHandler() {
 // ############################################################
 // Private
 // ############################################################
+
+void VoronoiHandler::updateTriVertices() {
+	triVertices.clear();
+	for (vTriangle *t : triangles) {
+		for (vVertexPoint *c : t->getCorners()) {
+			if (find(triVertices.begin(), triVertices.end(), c) == triVertices.end()) {
+				triVertices.push_back(c);
+			}
+		}
+	}
+}
 
 vector<vTriangle*> VoronoiHandler::findBorders(vector<vTriangle*> triangles) {
 	vector<vTriangle*> borderPolys;
@@ -263,7 +274,7 @@ vector<vec2> VoronoiHandler::makeCornerPoints(float max, float min) {
 }
 
 // Generate a triangle mesh from a set of points
-vector<vTriangle*> VoronoiHandler::generateTriangles(vector<vVertexPoint*> triCenters) {
+vector<vTriangle*> VoronoiHandler::generateTriangles(vector<vVertexPoint*> triCenters, Image *heightMap) {
 	list<vTriangle*> newTriangles;
 	list <vTriangle*> badTriangles;
 	vector<vTriangle*> deleteTriangles;
@@ -290,6 +301,10 @@ vector<vTriangle*> VoronoiHandler::generateTriangles(vector<vVertexPoint*> triCe
 	// add the points one at a time to the triangulation
 	for (vVertexPoint *v : triCenters) {
 		badTriangles.clear();
+
+		int px = v->getCoords().x * (imageSize - 1);
+		int py = v->getCoords().y * (imageSize - 1);
+		v->setZValue(heightMap->getIntensity(px, py)/255);
 
 		//if point is inside circumcircle of triangle, add it to the bad list
 		for (vTriangle *t : newTriangles) {
@@ -374,7 +389,10 @@ vector<vTriangle*> VoronoiHandler::generateTriangles(vector<vVertexPoint*> triCe
 	// Mark all border polygons and make final list
 	for (vTriangle *t : newTriangles) {
 		t->updateBorder();
-		t->updateCenter();
+		t->updateCenter(imageSize);
+		t->getCenter()->setZValue((heightMap->getIntensity(t->getCenter()->screenCoords.x, t->getCenter()->screenCoords.y)) / 255);
+		t->updateCorners(imageSize);
+		
 		finalTriangles.push_back(t);
 	}
 
@@ -400,14 +418,27 @@ void VoronoiHandler::addTriangles(vector<vVertexPoint*> triCenters, vector<vTria
 	for (vVertexPoint *v : triCenters) {
 		//cout << "Adding point " << v->getCoords() << endl;
 		badTriangles.clear();
+		bool parentIsRiver = false;
+		float parentWater = 0.0f;
+
+		int px = v->getCoords().x * (imageSize - 1);
+		int py = v->getCoords().y * (imageSize - 1);
+		//if (!v->isRiver()) v->setZValue(heightMap->getIntensity(px, py) / 255);
 
 		//if point is inside circumcircle of triangle, add it to the bad list
 		for (vTriangle *t : newTriangles) {
 			if (circumCircle(v, t)) {
 				//cout << "Point is inside triangle; " << t << endl;
 				badTriangles.push_back(t);
+				
+				if (t->isRiver()) {
+					parentIsRiver = true;
+					//parentWater = max(parentWater, t->getWater());
+				}
+				
 			}
 		}
+		//parentWater = parentWater / 2;
 
 		vector<vEdge*> holeEdges;
 
@@ -439,6 +470,18 @@ void VoronoiHandler::addTriangles(vector<vVertexPoint*> triCenters, vector<vTria
 		// re-triangulate the polygonal hole
 		for (vEdge* e : holeEdges) {
 			vTriangle *t = new vTriangle(v, e->v0, e->v1); // form a triangle from edge to point
+			
+			if (parentIsRiver) {
+				for (vVertexPoint *c : t->getCorners()) {
+					if (c->isRiver()) {
+						t->setRiver(true, 0);
+						}
+
+				}
+			}
+
+			//if (!t->isRiver()) v->setZValue(heightMap->getIntensity(px, py) / 255);
+			
 			//cout << "Adding New Triangle " << t << " with "<<t->getEdges().size()<<" edges."<< endl;
 			newTriangles.push_back(t);
 		}
@@ -484,13 +527,19 @@ void VoronoiHandler::addTriangles(vector<vVertexPoint*> triCenters, vector<vTria
 	// Mark all border polygons and make final list
 	for (vTriangle *t : newTriangles) {
 		t->updateBorder();
+		t->updateCenter(imageSize);
+		t->updateCorners(imageSize);
+		//if (t->isRiver()) t->updateCornerZ();
+		//else {
+		//	t->getCenter()->setZValue(heightMap->getIntensity(t->getCenter()->screenCoords.x, t->getCenter()->screenCoords.y) / 255);
+		//}
 		finalTriangles.push_back(t);
 	}
 
 	cout << "Total triangles after subdivision: " << finalTriangles.size() << endl;
 	for (vTriangle *t : finalTriangles) {
 		//t->updateCenter();
-		cout << "Triangle " << t << " with center " << t->getCenter()->getCoords() << endl;
+		//cout << "Triangle " << t << " with center " << t->getCenter()->getCoords() << endl;
 		// cout << "\tTriangle " << t << ": " << t->getCorners().at(0)->getCoords() << " " << t->getCorners().at(1)->getCoords() << t->getCorners().at(2)->getCoords() << endl;
 	}
 	this->triangles = finalTriangles;
@@ -617,7 +666,7 @@ vector<vVertexPoint*> VoronoiHandler::relaxTriangles(vector<vVertexPoint*> point
 
 	// Update the poly centers now the vertices have moved
 	for (vTriangle *t : polys) {
-		t->updateCenter();
+		t->updateCenter(imageSize);
 	}
 
 	//cout << "Number of border vertices: " << borderCount << endl;
@@ -695,14 +744,14 @@ void VoronoiHandler::sampleImage(int imageSize, Image *heightMap) {
 		int y = p->getCoords().y * (imageSize - 1);
 
 		p->screenCoords = vec2(x, y);
-		p->setZValue(heightMap->getIntensity(x, y));
+		p->setZValue(heightMap->getIntensity(x, y) / 255);
 	}
 
 	for (vVertexPoint * p : polyVertices) {
 		int x = p->getCoords().x * (imageSize - 1);
 		int y = p->getCoords().y * (imageSize - 1);
 		p->screenCoords = vec2(x, y);
-		p->setZValue(heightMap->getIntensity(x, y));
+		p->setZValue(heightMap->getIntensity(x, y) / 255);
 		//cout << "PolyVertex at " << p->screenCoords << ", Intensity " << p->getZValue() << endl;
 	}
 
@@ -710,7 +759,7 @@ void VoronoiHandler::sampleImage(int imageSize, Image *heightMap) {
 		int x = p->getCoords().x * (imageSize - 1);
 		int y = p->getCoords().y * (imageSize - 1);
 		p->screenCoords = vec2(x, y);
-		p->setZValue(heightMap->getIntensity(x, y));
+		p->setZValue(heightMap->getIntensity(x, y) / 255);
 	}
 }
 
@@ -761,3 +810,4 @@ void VoronoiHandler::cornerCheck(vector<vTriangle*> tris) {
 		cout << "Triangle " << t << " has " << t->getCorners().size() << "corners." << endl;
 	}
 }
+

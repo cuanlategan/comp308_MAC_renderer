@@ -202,3 +202,10 @@ void vVertexPoint::setWater(float water) {
 float vVertexPoint::getWater() {
 	return this->water;
 }
+
+void vVertexPoint::setScreenCoords(int imageSize) {
+	int x = coords.x * (imageSize - 1);
+	int y = coords.y * (imageSize - 1);
+
+	screenCoords = vec2(x, y);
+}

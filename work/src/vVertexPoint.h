@@ -79,6 +79,8 @@ public:
 	void removePolyCenter(vTriangle*);
 	vTriangle* getPolyCenter();
 
+	void setScreenCoords(int);
+
 	vec2 screenCoords;
 };
 
