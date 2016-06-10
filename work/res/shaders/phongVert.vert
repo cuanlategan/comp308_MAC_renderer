@@ -28,15 +28,30 @@ void main(void)
    {
 
       vec2 dir = vec2(dirX,dirY);
-
       float freq = 2*PI/wavelength;
       float phase_con = freq*speed;
       float QA = steepnes*amplitude;
-
-      //vec4 result = calcGerstnerWave(freq, QA,dir,phase_con);
       vec4 result = calcGerstnerWave(freq, QA,amplitude,attr_center, dir, time, phase_con);
 
-      gl_Position = gl_ModelViewProjectionMatrix * ((result*0.6) +gl_Vertex);
+      dir = vec2(dirX+0.3,dirY+0.3);
+      freq = 2*PI/(wavelength*.7);
+      phase_con = freq*speed;
+      QA = (steepnes+.2)*(amplitude+0.3);
+      result += calcGerstnerWave(freq, QA,amplitude,attr_center, dir, time, phase_con);
+
+      dir = vec2(dirY-0.333,dirX-0.333);
+      freq = 2*PI/(wavelength*1.3);
+      phase_con = freq*speed;
+      QA = (steepnes-.23)*(amplitude-0.3);
+      result += calcGerstnerWave(freq, QA,amplitude,attr_center, dir, time, phase_con);
+
+      result /= 3;
+
+
+
+
+
+      gl_Position = gl_ModelViewProjectionMatrix * ((result*0.3) +gl_Vertex);
       //gl_Position = gl_ModelViewProjectionMatrix * (result +gl_Vertex);
 
    }
@@ -59,19 +74,3 @@ vec4 calcGerstnerWave(float frequency, float QA, float amplitude, vec3 position,
 
 
 
-vec4 calcGerstnerWave(float frequency, float QA,   vec2 direction,float phase_const)
-    {
-
-
-        vec3 test = attr_center;
-
-        vec2 dir = normalize(direction);
-        //vec2 dir = direction;
-
-        float wave_phase = frequency * dot(dir,test.xy) + (time*phase_const);
-
-        float c = cos(wave_phase);
-        float s = sin(wave_phase);
-
-        return  vec4(QA*gl_Vertex.x*c, QA*gl_Vertex.y*c, amplitude*s, 0.0);
-    }

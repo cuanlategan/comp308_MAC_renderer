@@ -77,7 +77,7 @@ Geometry *g_geometry = nullptr;
 RiverHandler *g_riverHandler;
 bool wireframe = false;
 bool drawGraph = false;
-
+bool drawGround = true;
 float t = 0.f;
 
 bool draw_lights = true;
@@ -215,7 +215,7 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 		if (action == 1) drawGraph = true;
 	}
 	if (key == 264) { // key down-arrow
-
+		if (action == 1) drawGround = !drawGround;
 	}
 	if (key == 263) { // key left-arrow
 
@@ -404,20 +404,22 @@ void render(int width, int height) {
 	// Uses the default OpenGL pipeline
 	if (!g_useShader) {
 
+		if(drawGround){
+			// Set the current material (for all objects) to red
+			glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+			glColor3f(1.0f, 0.0f, 0.0f); //red
+			if (wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			// Render geometry
+			glPushMatrix();
+			{
+				glScalef(60.0, 5.0, 60.0);
+				glTranslatef(0,0,-1);
+				g_geometry->renderGeometry();
 
-		// Set the current material (for all objects) to red
-		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-		glColor3f(1.0f, 0.0f, 0.0f); //red
-		if (wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		// Render geometry
-		glPushMatrix();
-		{
-			glScalef(60.0, 5.0, 60.0);
-			glTranslatef(0,0,-1);
-			g_geometry->renderGeometry();
-
+			}
+			glPopMatrix();
 		}
-		glPopMatrix();
+
 
 
 
@@ -441,24 +443,21 @@ void render(int width, int height) {
 
 
 	else {
-		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-		glColor3f(1.0f, 0.0f, 0.0f); //red
-		if (wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		// Render geometry
-		glPushMatrix();
-		{
-			glScalef(60.0, 5.0, 60.0);
-			glTranslatef(0,0,-1);
-			g_geometry->renderGeometry();
+		if(drawGround){
+			// Set the current material (for all objects) to red
+			glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+			glColor3f(1.0f, 0.0f, 0.0f); //red
+			if (wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			// Render geometry
+			glPushMatrix();
+			{
+				glScalef(60.0, 5.0, 60.0);
+				glTranslatef(0,0,-1);
+				g_geometry->renderGeometry();
 
+			}
+			glPopMatrix();
 		}
-		glPopMatrix();
-
-		/*glPushMatrix();
-		glScalef(60.0, 1.0, 60.0);
-		glTranslatef(0,0,-1);
-		g_geometry->renderGeometry();
-		glPopMatrix();*/
 
 		glUseProgram(g_phong_sdr);
 

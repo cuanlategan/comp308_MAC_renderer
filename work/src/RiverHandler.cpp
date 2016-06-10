@@ -218,6 +218,7 @@ void RiverHandler::drawAll() {
 	//CImg stuff, needed for testing
 	const unsigned char cRed[] = { 255,0,0 };
 	const unsigned char cBlue[] = { 0,0,255 };
+	const unsigned char cDarkBlue[] = { 0,0,100 };
 	const unsigned char cWhite[] = { 255,255,255 };
 	const unsigned char cBlack[] = { 0,0,0 };
 	const unsigned char cGrey[] = { 127,127,127 };
@@ -232,7 +233,7 @@ void RiverHandler::drawAll() {
 	//cout << "Found " << graph->getPolygons().size() << " polygons, with " << graph->getPolyEdges().size() << " edges." << endl;
 
 	//drawEdges(graph->getTriEdges(), &pointDisplay, cGrey);
-	//drawEdges(graph->getPolyEdges(), &pointDisplay, cYellow);
+	drawEdges(graph->getPolyEdges(), &pointDisplay, cDarkBlue);
 	//drawPoints(graph->getPolyVertices(), &pointDisplay, cRed ,cBlue, radius);
 	//drawPoints(riverPoints, &pointDisplay, cYellow, cRed, radius);
 	drawPolygons(graph->getTriangles(), &pointDisplay, cGrey, cRed, radius);
@@ -279,7 +280,7 @@ void RiverHandler::drawRivers(vector<vector<vVertexPoint*>> riverSet, CImg<unsig
 				int p1y = r->getDownstream()->screenCoords.y;
 				int points[4] = { p0x, p0y, p1x, p1y };
 				//cout << "Riverline: " << points << endl;
-				// pointDisplay->draw_line(points[0], points[1], points[2], points[3], lineColor);
+				//pointDisplay->draw_line(points[0], points[1], points[2], points[3], lineColor);
 			}
 		}
 	}
