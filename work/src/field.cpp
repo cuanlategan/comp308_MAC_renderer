@@ -22,41 +22,72 @@ void Field::BuildVBOs() {
     glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_uvs->size() * sizeof(float) * 2, m_uvs->data(), GL_STATIC_DRAW_ARB);
 
 
-    glGenBuffers( 1, &g_center_attrib);                  // Get A Valid Name
-    glBindBufferARB( GL_ARRAY_BUFFER_ARB, g_center_attrib );         // Bind The Buffer
+    glGenBuffers(1, &g_center_attrib);                  // Get A Valid Name
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, g_center_attrib);         // Bind The Buffer
     // Load The Data
-    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_centers->size() * sizeof(float) * 3, m_centers->data(), GL_DYNAMIC_DRAW_ARB );
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_centers->size() * sizeof(float) * 3, m_centers->data(), GL_DYNAMIC_DRAW_ARB);
 
 
     // Our Copy Of The Data Is No Longer Necessary, It Is Safe In The Graphics Card
     //m_points->clear(); delete(m_points); m_points = NULL;
     //m_uvs->clear(); delete(m_uvs); m_uvs = NULL;
 }
-cgra::vec3 Field::getRandomVertOnFace(cgra::vec3 a,cgra::vec3 b,cgra::vec3 c){
-    /*float floor = 0, ceiling = 3.5, range = (ceiling - floor);
-    float rnd = floor + (range * rand() / (RAND_MAX + 1.0));*/
-    float floorY = a.y, ceilingY = b.y, rangeY = (ceilingY - floorY);
-    float rndY = floorY + (rangeY * rand() / (RAND_MAX + 1.0));
 
-    float floorX = a.x, ceilingX = b.x, rangeX = (ceilingX - floorX);
-    float rndX = floorX + (rangeX * rand() / (RAND_MAX + 1.0));
+cgra::vec3 Field::getRandomVertOnFace(cgra::vec3 p1, cgra::vec3 p2, cgra::vec3 p3) {
+
+    //srand((unsigned) time(0));
+    //srand(time(NULL));
+
+    float a = float(rand()) / float(RAND_MAX);
+    float b = float(rand()) / float(RAND_MAX);
+    if (a + b > 1.0) {
+        a = 1 - a;
+        b = 1 - b;
+    }
+    float c = 1 - a - b;
+
+    /*std::cout <<"cuan rand a: " << a << "\n";
+    std::cout <<"cuan rand b: " << b << "\n";
+    std::cout <<"cuan rand c: " << c << "\n";*/
+
+    cgra::vec3 r1(p1.x * a, p1.y * a, p1.z * a);
+    cgra::vec3 r2(p2.x * b, p2.y * b, p2.z * b);
+    cgra::vec3 r3(p3.x * c, p3.y * c, p3.z * c);
+    cgra::vec3 result(r1.x + r2.x + r3.x, r1.y + r2.y + r3.y, r1.z + r2.z + r3.z);
+
+    //std::cout <<"cuan rand vert: " <<result << "\n";
+
+    /*cgra::vec3 result;
+    result.x = (1 - sqrt(a)) * p1.x + (sqrt(a) * (1 - b)) * p2.x + (sqrt(a) * b) * p3.x;
+    result.z = (1 - sqrt(a)) * p1.y + (sqrt(a) * (1 - b)) * p2.y + (sqrt(a) * b) * p1.y;*/
+
+    return result;
 }
 
-void Field::generateCluster(Geometry* geo) {
-
-    srand((unsigned)time(0));
+void Field::generateCluster(Geometry *geo) {
 
 
-    for(auto& tri: geo->getTriangles()){
-        for(int i=0; i<3; i++){
-            cgra::vec3 triPoint = geo->getPoints().at(tri.v[i].p);
-            glScalef(10.0, 1.0, 10.0);
+
+
+    /* for(auto& tri: geo->getTriangles()){
+         for(int i=0; i<3; i++){
+
+
+             *//*cgra::vec3 triPoint = geo->getPoints().at(tri.v[i].p);
+            //glScalef(10.0, 1.0, 10.0);
+            triPoint.x *= 60;
+            triPoint.z *= 60;
+            cgra::vec3 rotatedPoint(triPoint.x,triPoint.z,triPoint.y);*//*
+
+            cgra::vec3 triPoint = geo->getPoints().at(tri.v[0].p);
+            //glScalef(10.0, 1.0, 10.0);
             triPoint.x *= 60;
             triPoint.z *= 60;
             cgra::vec3 rotatedPoint(triPoint.x,triPoint.z,triPoint.y);
 
             Grass grass(rotatedPoint);
             grass_clusters->push_back(grass);
+
 
             for (auto &point :grass.getPoints()) {
                 m_points->push_back(point);
@@ -73,13 +104,62 @@ void Field::generateCluster(Geometry* geo) {
             }
 
         }
+    }*/
+    for (auto &tri: geo->getTriangles()) {
+
+
+        cgra::vec3 triPoint1 = geo->getPoints().at(tri.v[0].p);
+        triPoint1.x *= 60;
+        triPoint1.z *= 60;
+        cgra::vec3 triPoint2 = geo->getPoints().at(tri.v[1].p);
+        triPoint2.x *= 60;
+        triPoint2.z *= 60;
+        cgra::vec3 triPoint3 = geo->getPoints().at(tri.v[2].p);
+        triPoint3.x *= 60;
+        triPoint3.z *= 60;
+
+        float height = fabs(triPoint1.y - triPoint2.y);
+        float base = fabs(triPoint3.x - triPoint2.x);
+        float area = 0.5 * base * height;
+        std::cout << "height: " << height << "\n";
+        std::cout << "base: " << base << "\n";
+        std::cout << "area: " << area << "\n";
+
+        //cgra::vec3 ran = getRandomVertOnFace(triPoint1, triPoint2, triPoint3);
+        for (float i = 0; i < area; i += 0.01f) {
+            cgra::vec3 ran = getRandomVertOnFace(triPoint1, triPoint2, triPoint3);
+            //ran.x *= 60;
+            //ran.z *= 60;
+            cgra::vec3 rotatedPoint(ran.x, ran.z, ran.y);
+            std::cout <<"cuan rotated and scaled: " << rotatedPoint << "\n";
+
+            Grass grass(rotatedPoint);
+            grass_clusters->push_back(grass);
+
+
+            for (auto &point :grass.getPoints()) {
+                m_points->push_back(point);
+
+                cgra::vec3 center(grass.getPosition().x,
+                                  grass.getPosition().y,
+                                  grass.getPosition().z);
+                m_centers->push_back(center);
+                //std::cout << center << "\n";
+            }
+
+            for (auto &uv :grass.getUvs()) {
+                m_uvs->push_back(uv);
+            }
+        }
+
+
     }
 
     BuildVBOs();
 
 
-
 }
+
 void Field::generateCluster(int num_clusters) {
 
     for (int i = 0; i < num_clusters; i++) {
@@ -115,7 +195,7 @@ void Field::generateCluster(int num_clusters) {
     }
     int max_attributes = 0;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS_ARB, &max_attributes);
-    std::cout << "GL_MAX_VERTEX_ATTRIBS_ARB "<< max_attributes << "\n";
+    std::cout << "GL_MAX_VERTEX_ATTRIBS_ARB " << max_attributes << "\n";
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &max_attributes);
     std::cout << "GL_MAX_VERTEX_ATTRIBS " << max_attributes << "\n";
 
@@ -181,7 +261,7 @@ void Field::renderFieldShader(WaveGenerator *wave_gen, float time, GLint shader)
 
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, g_center_attrib);
     glEnableVertexAttribArrayARB(6);
-    glVertexAttribPointerARB(6, 3, GL_FLOAT, GL_FALSE,0,0);
+    glVertexAttribPointerARB(6, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, g_grass_tex);

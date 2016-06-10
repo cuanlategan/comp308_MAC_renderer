@@ -47,6 +47,7 @@ public:
             m_uvs->reserve(GRID_DIMENSION * GRID_DIMENSION * 3 * 2 * 3);
             m_centers->reserve(GRID_DIMENSION * GRID_DIMENSION);
             initGrassTexture();
+            srand(time(NULL));
     }
 
     void generateCluster(int num_clusters);
