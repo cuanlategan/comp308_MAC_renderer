@@ -77,14 +77,13 @@ public:
 	~VoronoiHandler();
 	vector<vTriangle*> generateTriangles(vector<vVertexPoint*>, Image*);
 	
-	void addTriangles(vector<vVertexPoint*>, vector<vTriangle*>);
+	void addTriangles(vector<vVertexPoint*>, vector<vTriangle*>, Image*, bool);
 
 	vector<vVertexPoint*> relaxTriangles(vector<vVertexPoint*>, vector<vTriangle*>);
 	vector<vTriangle*> generateVPolys(vector<vVertexPoint*>);
 	vector<vVertexPoint*> generatePointSet(int);
 
 	vector<vTriangle*> getTriangles();
-	void updateTriVertices();
 	vector<vVertexPoint*> getTriVertices();
 	vector<vEdge*> getTriEdges();
 
@@ -94,7 +93,7 @@ public:
 
 	void sampleImage(int,Image*);
 
-	void upRes();
+	void upRes(Image*);
 	
 	// void newMesh();
 

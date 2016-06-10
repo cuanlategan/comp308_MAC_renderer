@@ -19,9 +19,7 @@ class vTriangle{
 
 private:
 	
-	bool river = false;
-	float water = 0;
-	bool border = false;
+	bool border;
 	vVertexPoint* center;
 	vector<vVertexPoint*> corners;
 	vector<vEdge*> edges;
@@ -49,7 +47,6 @@ public:
 	void setNeighbours(vector<vTriangle*>);
 
 	void updateCorners(int);
-	void updateCornerZ();
 	
 
 	void addCorner(vVertexPoint*);
@@ -60,14 +57,9 @@ public:
 	void removeEdge(vEdge*);
 	void removeNeighbour(vTriangle*);
 
-	bool isRiver();
-	void setRiver(bool, float);
-
 	bool isBorder();
 	bool updateBorder();
 	void updateCenter(int);
-
-	float getWater();
 
 	bool invalid;
 
