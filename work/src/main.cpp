@@ -70,7 +70,7 @@ GLuint g_rivermap = 0;
 
 // Objects to be rendered
 WaveGenerator *g_wave_generator;
-Field field;
+Field* field = nullptr;
 Geometry *g_plane = nullptr;
 
 // Marks River Gen
@@ -317,6 +317,8 @@ void initShader() {
     // and the corrosponding locations for the files of each stage
     g_phong_sdr = makeShaderProgramFromFile({GL_VERTEX_SHADER, GL_FRAGMENT_SHADER},
                                          {"./work/res/shaders/phongVert.vert", "./work/res/shaders/phongFrag.frag"});
+    glBindAttribLocationARB(g_phong_sdr,6,"attr_center");
+    glLinkProgram(g_phong_sdr);
 }
 
 // Initializes the blue noise sampler and other useful resources for rendering water
@@ -399,14 +401,15 @@ void render(int width, int height) {
 
         t+=0.02;
         if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
-		// cuan
-		if (draw_geometry) { field.renderField(g_wave_generator, t); }
-		if (draw_points) { field.renderGrid(g_wave_generator, t); }
 
-        //drawWater();
+		// cuan
+		if (draw_geometry) { field->renderField(g_wave_generator, t); }
+		if (draw_points) { field->renderGrid(g_wave_generator, t); }
+       // drawWater();
 
 		glPushMatrix();
-		glScalef(10.0, 1.0, 10.0);
+		glScalef(60.0, 1.0, 60.0);
+        glTranslatef(0,0,-1);
 		g_plane->renderGeometry();
 		glPopMatrix();
 
@@ -416,23 +419,25 @@ void render(int width, int height) {
 
 
     else {
-
         glPushMatrix();
-        glScalef(10.0, 1.0, 10.0);
+        glScalef(60.0, 1.0, 60.0);
+        glTranslatef(0,0,-1);
         g_plane->renderGeometry();
         glPopMatrix();
 
         glUseProgram(g_phong_sdr);
+
         t+=0.02;
         if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
-        field.renderFieldShader(g_wave_generator, t, g_phong_sdr);
-        glUseProgram(0);
 
-        //drawWater();
+  
+        field->renderFieldShader(g_wave_generator, t, g_phong_sdr);
+       // drawWater();
 
+        glFlush();
 
         // Unbind our shader
-        glFlush();
+        glUseProgram(0);
     }
 
 
@@ -593,22 +598,20 @@ int main(int argc, char **argv) {
     // ...
 
     g_riverHandler = new RiverHandler();
-	g_riverHandler->drawAll();
+	//g_riverHandler->drawAll();
 
-	g_plane = new Geometry("./work/res/assets/plane.obj");
+	g_plane = g_riverHandler->makeGeo();
 
 
     g_wave_generator = new WaveGenerator();
-
-    g_wave_generator->addGerstnerWave(4.567,0.3,.8,1.5,vec2(-.3f, 1.f));
-    g_wave_generator->addGerstnerWave(7.685,0.2,.8,1.5,vec2(-.35f, 0.8f));
-    g_wave_generator->addGerstnerWave(2.2,0.1,.1,1.5,vec2(0.f, -1.0f));
-    g_wave_generator->addGerstnerWave(16.2,1.0,.75,2.5,vec2(0.f, 1.0f));
-
-
-
-    field.generateCluster(GRID_DIMENSION);
-    field.generateGrid(GRID_DIMENSION);
+    g_wave_generator->addGerstnerWave(4.567, 0.3, 0.8, 1.5, vec2(-.3f, 1.f));
+    //g_wave_generator->addGerstnerWave(7.685,0.2,.8,1.5,vec2(-.35f, 0.8f));
+    //g_wave_generator->addGerstnerWave(2.2,0.1,.1,1.5,vec2(0.f, -1.0f));
+    //g_wave_generator->addGerstnerWave(16.2,1.0,.75,2.5,vec2(0.f, 1.0f));
+    field = new Field();
+    //field->generateCluster(GRID_DIMENSION);
+    field->generateCluster(g_plane);
+    field->generateGrid(GRID_DIMENSION);
 
 
     cout << "HELLO" << endl;

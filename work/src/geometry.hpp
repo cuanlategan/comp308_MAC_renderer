@@ -62,5 +62,10 @@ public:
 
 	void renderGeometry();
 
+	std::vector<cgra::vec3> getPoints(){return m_points;}	// Point list
+	std::vector<cgra::vec2> getUvs(){return m_uvs;}		// Texture Coordinate list
+	std::vector<cgra::vec3> getNormals(){return m_normals;}	// Normal list
+	std::vector<triangle> getTriangles(){return m_triangles;}	// Triangle/Face list
+
 	
 };

@@ -38,13 +38,13 @@ void Grass::renderGeometry()
     }
     glPopMatrix();
 
-    //glFlush(); // not needed an cuts performance into half
+
 }
 
 void Grass::setShear(const cgra::vec3& shear) {
     m_shear[4] = shear.x;
-    m_shear[5] = 1.f+shear.z;
-    m_shear[4] = shear.y;
+    m_shear[5] = 1.f+shear.z; // TODO is there a problem here?
+    m_shear[6] = shear.y;
 }
 
 
