@@ -76,6 +76,7 @@ Geometry *g_geometry = nullptr;
 // Marks River Gen
 RiverHandler *g_riverHandler;
 bool wireframe = false;
+bool drawGraph = false;
 
 float t = 0.f;
 
@@ -208,10 +209,10 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 
 	}
 	if (key == 32) { // key spacebar
-		if (action = 1) wireframe = !wireframe;
+		if (action == 1) wireframe = !wireframe;
 	}
 	if (key == 265) { // key up-arrow
-
+		if (action == 1) drawGraph = true;
 	}
 	if (key == 264) { // key down-arrow
 
@@ -379,6 +380,11 @@ void drawLights();
 //
 void render(int width, int height) {
 
+	if (drawGraph){
+		g_riverHandler->drawAll();
+		drawGraph = false;
+	}
+
 	// Grey/Blueish background
 	glClearColor(0.3f, 0.3f, 0.4f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -399,14 +405,14 @@ void render(int width, int height) {
 	if (!g_useShader) {
 
 
-// Set the current material (for all objects) to red
+		// Set the current material (for all objects) to red
 		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 		glColor3f(1.0f, 0.0f, 0.0f); //red
 		if (wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		// Render geometry
 		glPushMatrix();
 		{
-			glScalef(60.0, 1.0, 60.0);
+			glScalef(60.0, 5.0, 60.0);
 			glTranslatef(0,0,-1);
 			g_geometry->renderGeometry();
 
@@ -417,17 +423,17 @@ void render(int width, int height) {
 
 		t+=0.02;
 		if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
-
+		glDisable(GL_COLOR_MATERIAL);
 		// cuan
 		if (draw_geometry) { field->renderField(g_wave_generator, t); }
 		if (draw_points) { field->renderGrid(g_wave_generator, t); }
 		// drawWater();
 
-		glPushMatrix();
-		glScalef(60.0, 1.0, 60.0);
+		/*glPushMatrix();
+		glScalef(60.0, 5.0, 60.0);
 		glTranslatef(0,0,-1);
 		g_geometry->renderGeometry();
-		glPopMatrix();
+		glPopMatrix();*/
 
 		glFlush();
 
@@ -441,7 +447,7 @@ void render(int width, int height) {
 		// Render geometry
 		glPushMatrix();
 		{
-			glScalef(60.0, 1.0, 60.0);
+			glScalef(60.0, 5.0, 60.0);
 			glTranslatef(0,0,-1);
 			g_geometry->renderGeometry();
 
@@ -459,8 +465,8 @@ void render(int width, int height) {
 		t+=0.02;
 		if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
 
+		if (draw_geometry) { field->renderFieldShader(g_wave_generator, t, g_phong_sdr);}
 
-		field->renderFieldShader(g_wave_generator, t, g_phong_sdr);
 		// drawWater();
 
 		glFlush();

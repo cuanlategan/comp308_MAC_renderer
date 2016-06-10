@@ -107,12 +107,15 @@ void Field::generateCluster(Geometry *geo) {
         cgra::vec3 triPoint1 = geo->getPoints().at(tri.v[0].p);
         triPoint1.x *= 60;
         triPoint1.z *= 60;
+        triPoint1.y *= 5;
         cgra::vec3 triPoint2 = geo->getPoints().at(tri.v[1].p);
         triPoint2.x *= 60;
         triPoint2.z *= 60;
+        triPoint2.y *= 5;
         cgra::vec3 triPoint3 = geo->getPoints().at(tri.v[2].p);
         triPoint3.x *= 60;
         triPoint3.z *= 60;
+        triPoint3.y *= 5;
 
         float height = fabs(triPoint1.y - triPoint2.y);
         float base = fabs(triPoint3.x - triPoint2.x);
