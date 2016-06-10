@@ -55,11 +55,7 @@ cgra::vec3 Field::getRandomVertOnFace(cgra::vec3 p1, cgra::vec3 p2, cgra::vec3 p
     cgra::vec3 r3(p3.x * c, p3.y * c, p3.z * c);
     cgra::vec3 result(r1.x + r2.x + r3.x, r1.y + r2.y + r3.y, r1.z + r2.z + r3.z);
 
-    //std::cout <<"cuan rand vert: " <<result << "\n";
 
-    /*cgra::vec3 result;
-    result.x = (1 - sqrt(a)) * p1.x + (sqrt(a) * (1 - b)) * p2.x + (sqrt(a) * b) * p3.x;
-    result.z = (1 - sqrt(a)) * p1.y + (sqrt(a) * (1 - b)) * p2.y + (sqrt(a) * b) * p1.y;*/
 
     return result;
 }
@@ -121,9 +117,10 @@ void Field::generateCluster(Geometry *geo) {
         float height = fabs(triPoint1.y - triPoint2.y);
         float base = fabs(triPoint3.x - triPoint2.x);
         float area = 0.5 * base * height;
-        std::cout << "height: " << height << "\n";
+
+        /*std::cout << "height: " << height << "\n";
         std::cout << "base: " << base << "\n";
-        std::cout << "area: " << area << "\n";
+        std::cout << "area: " << area << "\n";*/
 
         //cgra::vec3 ran = getRandomVertOnFace(triPoint1, triPoint2, triPoint3);
         for (float i = 0; i < area; i += 0.01f) {
@@ -131,7 +128,7 @@ void Field::generateCluster(Geometry *geo) {
             //ran.x *= 60;
             //ran.z *= 60;
             cgra::vec3 rotatedPoint(ran.x, ran.z, ran.y);
-            std::cout <<"cuan rotated and scaled: " << rotatedPoint << "\n";
+            //std::cout <<"cuan rotated and scaled: " << rotatedPoint << "\n";
 
             Grass grass(rotatedPoint);
             grass_clusters->push_back(grass);

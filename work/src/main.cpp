@@ -64,6 +64,7 @@ vec3 g_camera_eye(0.f,0.f,0.f);
 bool g_useShader = true;
 GLuint g_phong_sdr = 0;
 GLuint g_grass_tex = 0;
+GLuint g_rock_tex = 0;
 
 // Rivermap texture
 GLuint g_rivermap = 0;
@@ -288,13 +289,13 @@ void initTexture() {
 
 
 
-    Image tex_grass("./work/res/textures/tall-grass3.png");
-    glGenTextures(1, &g_grass_tex); // Generate texture ID
+    Image tex_rock("./work/res/textures/rocks.jpg");
+    glGenTextures(1, &g_rock_tex); // Generate texture ID
 
-    glBindTexture(GL_TEXTURE_2D, g_grass_tex); // Bind it as a 2D texture
+    glBindTexture(GL_TEXTURE_2D, g_rock_tex); // Bind it as a 2D texture
     // Finnaly, actually fill the data into our texture
-    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, tex_grass.w, tex_grass.h, tex_grass.glFormat(), GL_UNSIGNED_BYTE,
-                      tex_grass.dataPointer());
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, tex_rock.w, tex_rock.h, tex_rock.glFormat(), GL_UNSIGNED_BYTE,
+                      tex_rock.dataPointer());
 
     //glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,tex_grass.w,tex_grass.h,0,GL_RGBA,GL_UNSIGNED_BYTE,tex_grass.dataPointer());
 
@@ -419,6 +420,10 @@ void render(int width, int height) {
 
 
     else {
+        /*glEnable(GL_TEXTURE_2D);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, g_rock_tex);*/
+
         glPushMatrix();
         glScalef(60.0, 1.0, 60.0);
         glTranslatef(0,0,-1);
