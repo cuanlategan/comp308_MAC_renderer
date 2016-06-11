@@ -56,7 +56,6 @@ cgra::vec3 Field::getRandomVertOnFace(cgra::vec3 p1, cgra::vec3 p2, cgra::vec3 p
     cgra::vec3 result(r1.x + r2.x + r3.x, r1.y + r2.y + r3.y, r1.z + r2.z + r3.z);
 
 
-
     return result;
 }
 
@@ -105,32 +104,32 @@ void Field::generateCluster(Geometry *geo) {
 
 
         cgra::vec3 triPoint1 = geo->getPoints().at(tri.v[0].p);
-        triPoint1.x *= 60;
-        triPoint1.z *= 60;
-        triPoint1.y *= 5;
+        /*triPoint1.x *= 10;
+        triPoint1.z *= 10;
+        triPoint1.y *= 10;*/
         cgra::vec3 triPoint2 = geo->getPoints().at(tri.v[1].p);
-        triPoint2.x *= 60;
-        triPoint2.z *= 60;
-        triPoint2.y *= 5;
+        /*triPoint2.x *= 10;
+        triPoint2.z *= 10;
+        triPoint2.y *= 10;*/
         cgra::vec3 triPoint3 = geo->getPoints().at(tri.v[2].p);
-        triPoint3.x *= 60;
-        triPoint3.z *= 60;
-        triPoint3.y *= 5;
+        /*triPoint3.x *= 10;
+        triPoint3.z *= 10;
+        triPoint3.y *= 10;*/
 
-        float height = fabs(triPoint1.y - triPoint2.y);
-        float base = fabs(triPoint3.x - triPoint2.x);
-        float area = 0.5 * base * height;
+        float height = float(fabs(triPoint1.y - triPoint2.y));
+        float base = float(fabs(triPoint3.x - triPoint2.x));
+        float area = 0.5f * base * height;
 
         /*std::cout << "height: " << height << "\n";
         std::cout << "base: " << base << "\n";
         std::cout << "area: " << area << "\n";*/
 
         //cgra::vec3 ran = getRandomVertOnFace(triPoint1, triPoint2, triPoint3);
-        for (float i = 0; i < area; i += 0.02f) {
+        for (float i = 0; i < area; i += 0.00003f) {
             cgra::vec3 ran = getRandomVertOnFace(triPoint1, triPoint2, triPoint3);
             //ran.x *= 60;
             //ran.z *= 60;
-            cgra::vec3 rotatedPoint(ran.x, ran.z, ran.y);
+            cgra::vec3 rotatedPoint(ran.x, ran.y, ran.z);
             //std::cout <<"cuan rotated and scaled: " << rotatedPoint << "\n";
 
             Grass grass(rotatedPoint);
@@ -239,10 +238,10 @@ void Field::renderFieldShader(WaveGenerator *wave_gen, float time, GLint shader)
     glAlphaFunc(GL_GREATER, 0.5f);
 
     glUniform1f(glGetUniformLocation(shader, "time"), time); // set time uniform in shaders
-    glUniform1f(glGetUniformLocation(shader, "wavelength"), 4.567);
-    glUniform1f(glGetUniformLocation(shader, "amplitude"), 0.3f);
+    glUniform1f(glGetUniformLocation(shader, "wavelength"), 0.133);
+    glUniform1f(glGetUniformLocation(shader, "amplitude"), 0.005f);
     glUniform1f(glGetUniformLocation(shader, "steepnes"), 0.8f);
-    glUniform1f(glGetUniformLocation(shader, "speed"), 1.5);
+    glUniform1f(glGetUniformLocation(shader, "speed"), 0.05f);
 
     //GLfloat dir[2] = {1.f, 1.f};
     //glUniform2fv(glGetUniformLocation(shader, "direction"), 2, dir);
@@ -274,6 +273,7 @@ void Field::renderFieldShader(WaveGenerator *wave_gen, float time, GLint shader)
 
     glPushMatrix();
     {
+        //glTranslatef(0,0,-.5);
         glRotatef(-90, 1, 0, 0);
         glDrawArrays(GL_TRIANGLES, 0, m_points->size());    // Draw All Of The Triangles At Once
     }

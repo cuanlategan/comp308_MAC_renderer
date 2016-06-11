@@ -33,17 +33,17 @@ void main(void)
       float QA = steepnes*amplitude;
       vec4 result = calcGerstnerWave(freq, QA,amplitude,attr_center, dir, time, phase_con);
 
-      dir = vec2(dirX+0.3,dirY+0.3);
+     /* dir = vec2(dirX*0.66,dirY*0.66);
       freq = 2*PI/(wavelength*.7);
       phase_con = freq*speed;
-      QA = (steepnes+.2)*(amplitude+0.3);
+      QA = (steepnes*1.2)*(amplitude*1.3);
       result += calcGerstnerWave(freq, QA,amplitude,attr_center, dir, time, phase_con);
 
-      dir = vec2(dirY-0.333,dirX-0.333);
+      dir = vec2(dirY*-0.77,dirX*-0.77);
       freq = 2*PI/(wavelength*1.3);
       phase_con = freq*speed;
-      QA = (steepnes-.23)*(amplitude-0.3);
-      result += calcGerstnerWave(freq, QA,amplitude,attr_center, dir, time, phase_con);
+      QA = (steepnes*.83)*(amplitude*.83);
+      result += calcGerstnerWave(freq, QA,amplitude,attr_center, dir, time, phase_con);*/
 
       result /= 3;
 
@@ -51,7 +51,7 @@ void main(void)
 
 
 
-      gl_Position = gl_ModelViewProjectionMatrix * ((result*0.3) +gl_Vertex);
+      gl_Position = gl_ModelViewProjectionMatrix * ((result*.5) +gl_Vertex);
       //gl_Position = gl_ModelViewProjectionMatrix * (result +gl_Vertex);
 
    }

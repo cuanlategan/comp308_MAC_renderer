@@ -55,48 +55,63 @@ Grass::Grass(vec3 position) {
     this->position = position;
     vec3 p = position;
 
+    /*float height = 1.f;
+    float half_width = 1.f;
+    float r_half_width = 0.707107f;*/
+
+   /* float height = 0.15625f;
+    float half_width = 0.078125;
+    float r_half_width = 0.055243f;*/
+
+    /*float height = 0.03125f;
+    float half_width = 0.015625f;
+    float r_half_width = 0.011049f;*/
+
+    float height = 0.015f;
+    float half_width = 0.0075f;
+    float r_half_width = 0.005303f;
 
     // blade 1
-    m_points.push_back(vec3(1.f+p.x, 0.f+p.y, 2.f+p.z));
-    m_points.push_back(vec3(-1.f+p.x, 0.f+p.y, 2.f+p.z));
-    m_points.push_back(vec3(1.f+p.x, 0.f+p.y, 0.f+p.z));
+    m_points.push_back(vec3(half_width+p.x, 0.f+p.y, height+p.z));
+    m_points.push_back(vec3(-half_width+p.x, 0.f+p.y, height+p.z));
+    m_points.push_back(vec3(half_width+p.x, 0.f+p.y, 0.f+p.z));
     m_uvs.push_back(vec2(1.f,0.f));
     m_uvs.push_back(vec2(0.f,0.f));
     m_uvs.push_back(vec2(1.f,1.f));
     //bottom face
-    m_points.push_back(vec3(-1.f+p.x, 0.f+p.y, 0.f+p.z));
-    m_points.push_back(vec3(1.f+p.x, 0.f+p.y, 0.f+p.z));
-    m_points.push_back(vec3(-1.f+p.x, 0.f+p.y, 2.f+p.z));
+    m_points.push_back(vec3(-half_width+p.x, 0.f+p.y, 0.f+p.z));
+    m_points.push_back(vec3(half_width+p.x, 0.f+p.y, 0.f+p.z));
+    m_points.push_back(vec3(-half_width+p.x, 0.f+p.y, height+p.z));
     m_uvs.push_back(vec2(0.f,1.f));
     m_uvs.push_back(vec2(1.f,1.f));
     m_uvs.push_back(vec2(0.f,0.f));
 
     // blade 2
-    m_points.push_back(vec3(0.707107f+p.x, -0.707107f+p.y, 2.f+p.z));
-    m_points.push_back(vec3(-0.707107f+p.x, 0.707107f+p.y, 2.f+p.z));
-    m_points.push_back(vec3(0.707107f+p.x, -0.707107f+p.y, 0.f+p.z));
+    m_points.push_back(vec3(r_half_width+p.x, -r_half_width+p.y, height+p.z));
+    m_points.push_back(vec3(-r_half_width+p.x, r_half_width+p.y, height+p.z));
+    m_points.push_back(vec3(r_half_width+p.x, -r_half_width+p.y, 0.f+p.z));
     m_uvs.push_back(vec2(1.f,0.f));
     m_uvs.push_back(vec2(0.f,0.f));
     m_uvs.push_back(vec2(1.f,1.f));
     //bottom face
-    m_points.push_back(vec3(-0.707107f+p.x, 0.707107f+p.y, 0.f+p.z));
-    m_points.push_back(vec3(0.707107f+p.x, -0.707107f+p.y, 0.f+p.z));
-    m_points.push_back(vec3(-0.707107f+p.x, 0.707107f+p.y, 2.f+p.z));
+    m_points.push_back(vec3(-r_half_width+p.x, r_half_width+p.y, 0.f+p.z));
+    m_points.push_back(vec3(r_half_width+p.x, -r_half_width+p.y, 0.f+p.z));
+    m_points.push_back(vec3(-r_half_width+p.x, r_half_width+p.y, height+p.z));
     m_uvs.push_back(vec2(0.f,1.f));
     m_uvs.push_back(vec2(1.f,1.f));
     m_uvs.push_back(vec2(0.f,0.f));
 
     // blade 3
-    m_points.push_back(vec3(0.707107f+p.x, 0.707107f+p.y, 2.f+p.z));
-    m_points.push_back(vec3(-0.707107f+p.x, -0.707107f+p.y, 2.f+p.z));
-    m_points.push_back(vec3(0.707107f+p.x, 0.707107f+p.y, 0.f+p.z));
+    m_points.push_back(vec3(r_half_width+p.x, r_half_width+p.y, height+p.z));
+    m_points.push_back(vec3(-r_half_width+p.x, -r_half_width+p.y, height+p.z));
+    m_points.push_back(vec3(r_half_width+p.x, r_half_width+p.y, 0.f+p.z));
     m_uvs.push_back(vec2(1.f,0.f));
     m_uvs.push_back(vec2(0.f,0.f));
     m_uvs.push_back(vec2(1.f,1.f));
     //bottom face
-    m_points.push_back(vec3(-0.707107f+p.x, -0.707107f+p.y, 0.f+p.z));
-    m_points.push_back(vec3(0.707107f+p.x, 0.707107f+p.y, 0.f+p.z));
-    m_points.push_back(vec3(-0.707107f+p.x, -0.707107f+p.y, 2.f+p.z));
+    m_points.push_back(vec3(-r_half_width+p.x, -r_half_width+p.y, 0.f+p.z));
+    m_points.push_back(vec3(r_half_width+p.x, r_half_width+p.y, 0.f+p.z));
+    m_points.push_back(vec3(-r_half_width+p.x, -r_half_width+p.y, height+p.z));
     m_uvs.push_back(vec2(0.f,1.f));
     m_uvs.push_back(vec2(1.f,1.f));
     m_uvs.push_back(vec2(0.f,0.f));

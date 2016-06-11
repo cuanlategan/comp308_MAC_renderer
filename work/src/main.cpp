@@ -44,8 +44,8 @@ GLFWwindow *g_window;
 // Projection values
 //
 float g_fovy = 60.0;
-float g_znear = 0.1;
-float g_zfar = 1000.0;
+float g_znear = 0.01;
+float g_zfar = 100.0;
 
 
 // Mouse controlled Camera values
@@ -87,7 +87,7 @@ bool draw_directional_light = true;
 bool draw_point_light = true;
 
 bool draw_points = false;
-bool draw_geometry = true;
+bool draw_grass = true;
 
 float spot_cutoff = 6.5f;
 float table_rotation = 0.f;
@@ -147,7 +147,7 @@ void scrollCallback(GLFWwindow *win, double xoffset, double yoffset) {
 void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 	//cout << "Key Callback :: key=" << key << "scancode=" << scancode
 	//<< "action=" << action << "mods=" << mods << endl;
-
+	float scale = 0.01f;
 	if (key == 49 && action == 1) { // key 1
 		draw_ambiant_light = !draw_ambiant_light;
 		cout << "ambiant: " << draw_ambiant_light << endl;
@@ -172,8 +172,8 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 		cout << "draw_points: " << draw_points << endl;
 	}
 	if (key == 81 && action == 1) { // key q
-		draw_geometry = !draw_geometry;
-		cout << "draw_geometry: " << draw_geometry << endl;
+		draw_grass = !draw_grass;
+		cout << "draw_grass: " << draw_grass << endl;
 	}
 	if (key == 84) { // key t
 
@@ -181,29 +181,29 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 	if (key == 87) { // key w
 		//g_camera_eye.z += 0.5f;
 
-		g_camera_eye.x += float(sin(radians(g_yaw)));
-		g_camera_eye.z -= float(cos(radians(g_yaw)));
-		g_camera_eye.y -= float(sin(radians(g_pitch)));
+		g_camera_eye.x += sin(radians(g_yaw))* scale;
+		g_camera_eye.z -= cos(radians(g_yaw)) * scale;
+		g_camera_eye.y -= sin(radians(g_pitch))* scale;
 
 	}
 	if (key == 65) { // key a
 		//g_camera_eye.x += 0.5f;
 
-		g_camera_eye.x -= float(cos(radians(g_yaw))) * 0.2;
-		g_camera_eye.z -= float(sin(radians(g_yaw))) * 0.2;
+		g_camera_eye.x -= cos(radians(g_yaw)) * scale;
+		g_camera_eye.z -= sin(radians(g_yaw)) * scale;
 	}
 	if (key == 83) { // key s
 		//g_camera_eye.z -= 0.5f;
 
-		g_camera_eye.x -= float(sin(radians(g_yaw)));
-		g_camera_eye.z += float(cos(radians(g_yaw)));
-		g_camera_eye.y += float(sin(radians(g_pitch)));
+		g_camera_eye.x -= sin(radians(g_yaw))* scale;
+		g_camera_eye.z += cos(radians(g_yaw))* scale;
+		g_camera_eye.y += sin(radians(g_pitch))* scale;
 	}
 	if (key == 68) { // key d
 		//g_camera_eye.x -= 0.5f;
 
-		g_camera_eye.x += float(cos(radians(g_yaw))) * 0.2;
-		g_camera_eye.z += float(sin(radians(g_yaw))) * 0.2;
+		g_camera_eye.x += float(cos(radians(g_yaw))) * scale;
+		g_camera_eye.z += float(sin(radians(g_yaw))) * scale;
 	}
 	if (key == 341) { // key ctrl
 
@@ -247,8 +247,9 @@ void charCallback(GLFWwindow *win, unsigned int c) {
 void initLight() {
 
 	if (draw_ambiant_light) {
+		GLfloat ambiant_pos[] = {g_camera_eye.x, g_camera_eye.y, g_camera_eye.z, 0.0f}; // TODO wheres position??
 		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, light_0_ambient);
-		//glLightfv(GL_LIGHT0, GL_POSITION, light_0_position); //keep default z dir //TODO
+		glLightfv(GL_LIGHT0, GL_POSITION, ambiant_pos); //keep default z dir //TODO
 		glLightfv(GL_LIGHT0, GL_DIFFUSE, light_0_diffintensity);
 		glLightfv(GL_LIGHT0, GL_AMBIENT, light_0_ambient);
 		glEnable(GL_LIGHT0);
@@ -291,7 +292,7 @@ void initTexture() {
 
 
 
-	Image tex_grass("./work/res/textures/tall-grass3.png");
+	/*Image tex_grass("./work/res/textures/tall-grass3.png");
 	glGenTextures(1, &g_grass_tex); // Generate texture ID
 
 	glBindTexture(GL_TEXTURE_2D, g_grass_tex); // Bind it as a 2D texture
@@ -305,7 +306,7 @@ void initTexture() {
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);*/
 
 }
 
@@ -380,6 +381,10 @@ void drawLights();
 //
 void render(int width, int height) {
 
+	t+=0.02;
+	if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
+
+
 	if (drawGraph){
 		g_riverHandler->drawAll();
 		drawGraph = false;
@@ -412,30 +417,22 @@ void render(int width, int height) {
 			// Render geometry
 			glPushMatrix();
 			{
-				glScalef(60.0, 5.0, 60.0);
-				glTranslatef(0,0,-1);
+				//glScalef(60.0, 5.0, 60.0);
+				//glTranslatef(0,0,-1);
+				glRotatef(-90, 1, 0, 0);
 				g_geometry->renderGeometry();
 
 			}
 			glPopMatrix();
 		}
-
-
-
-
-		t+=0.02;
-		if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
 		glDisable(GL_COLOR_MATERIAL);
-		// cuan
-		if (draw_geometry) { field->renderField(g_wave_generator, t); }
-		if (draw_points) { field->renderGrid(g_wave_generator, t); }
-		// drawWater();
 
-		/*glPushMatrix();
-		glScalef(60.0, 5.0, 60.0);
-		glTranslatef(0,0,-1);
-		g_geometry->renderGeometry();
-		glPopMatrix();*/
+
+		// cuan
+		if (draw_grass) { field->renderField(g_wave_generator, t); }
+		if (draw_points) { field->renderGrid(g_wave_generator, t); }
+
+		// drawWater();
 
 		glFlush();
 
@@ -451,27 +448,25 @@ void render(int width, int height) {
 			// Render geometry
 			glPushMatrix();
 			{
-				glScalef(60.0, 5.0, 60.0);
-				glTranslatef(0,0,-1);
+				//glScalef(10.0, 10.0, 10.0);
+				//glTranslatef(0,0,-.5);
+				glRotatef(-90, 1, 0, 0);
 				g_geometry->renderGeometry();
 
 			}
 			glPopMatrix();
 		}
 
+
 		glUseProgram(g_phong_sdr);
-
-		t+=0.02;
-		if(t > 32.f) {cout << "time reset\n"; t = 0.f;}
-
-		if (draw_geometry) { field->renderFieldShader(g_wave_generator, t, g_phong_sdr);}
+		if (draw_grass) { field->renderFieldShader(g_wave_generator, t, g_phong_sdr);}
+		glUseProgram(0);
 
 		// drawWater();
 
 		glFlush();
 
-		// Unbind our shader
-		glUseProgram(0);
+
 	}
 
 
