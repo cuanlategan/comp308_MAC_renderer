@@ -607,4 +607,5 @@ vector<vector<vec3>> RiverHandler::returnRiverTris() {
 		triData.push_back(data);
 
 	}
+	return triData;
 }
