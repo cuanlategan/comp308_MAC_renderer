@@ -21,15 +21,18 @@ using namespace cimg_library;
 
 class RiverHandler {
 private:
-	int numberOfRivers = 1;
+	int density = 50;
+	int numberOfRivers = 2;
 	int cutoffPercent = 5;
-	float startWater = 0.01;
-	int waterScalar = 10;
+	float startWater = 0;
+	float waterScalar = 1;
 	int widthScalar = 10;
 	int zScalar = 2;
-	int smoothPasses = 0;
+	int smoothPasses = 2;
+	int complexMultiplier = density / 100;
+	int riverSamples = max(5, ((smoothPasses * complexMultiplier) + 1));
 
-	int density = 50;
+	
 	// int finalDensity = 600 - density - (numberOfRivers * (density / 4));
 	int finalDensity = 50;
 
@@ -67,6 +70,8 @@ private:
 	Geometry* makeGeo(vector<vTriangle*>);
 
 	void carveRivers(vector<vector<vVertexPoint*>>, vector<vTriangle*>);
+
+	vector<vVertexPoint*> makeRiverSpline(vector<vVertexPoint*>, vector<vec4>);
 
 	void rebuildHeightData(Image*);
 

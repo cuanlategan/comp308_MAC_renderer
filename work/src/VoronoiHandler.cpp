@@ -388,10 +388,11 @@ vector<vTriangle*> VoronoiHandler::generateTriangles(vector<vVertexPoint*> triCe
 
 	// Mark all border polygons and make final list
 	for (vTriangle *t : newTriangles) {
-		t->updateBorder();
-		t->updateCenter(imageSize);
+		//t->updateBorder();
+		//t->updateCenter(imageSize);
+		t->updateAll(imageSize);
 		t->getCenter()->setZValue((heightMap->getIntensity(t->getCenter()->screenCoords.x, t->getCenter()->screenCoords.y)) / 255);
-		t->updateCorners(imageSize);
+		//t->updateCorners(imageSize);
 		
 		finalTriangles.push_back(t);
 	}
@@ -418,8 +419,8 @@ void VoronoiHandler::addTriangles(vector<vVertexPoint*> triCenters, vector<vTria
 	for (vVertexPoint *v : triCenters) {
 		//cout << "Adding point " << v->getCoords() << endl;
 		badTriangles.clear();
-		bool parentIsRiver = false;
-		float parentWater = 0.0f;
+		//bool parentIsRiver = false;
+		//float parentWater = 0.0f;
 
 		int px = v->getCoords().x * (imageSize - 1);
 		int py = v->getCoords().y * (imageSize - 1);
@@ -431,10 +432,10 @@ void VoronoiHandler::addTriangles(vector<vVertexPoint*> triCenters, vector<vTria
 				//cout << "Point is inside triangle; " << t << endl;
 				badTriangles.push_back(t);
 				
-				if (t->isRiver()) {
-					parentIsRiver = true;
+				//if (t->isRiver()) {
+				//	parentIsRiver = true;
 					//parentWater = max(parentWater, t->getWater());
-				}
+				//}
 				
 			}
 		}
@@ -470,16 +471,13 @@ void VoronoiHandler::addTriangles(vector<vVertexPoint*> triCenters, vector<vTria
 		// re-triangulate the polygonal hole
 		for (vEdge* e : holeEdges) {
 			vTriangle *t = new vTriangle(v, e->v0, e->v1); // form a triangle from edge to point
-			
-			if (parentIsRiver) {
-				for (vVertexPoint *c : t->getCorners()) {
-					if (c->isRiver()) {
-						t->setRiver(true, 0);
-						}
-
-				}
+			if (e->v0->isRiver() && e->v1->isRiver()) {
+				v->setRiver(true);
+				float minWater = min(e->v0->getWater(), e->v1->getWater());
+				float maxWater = max(e->v0->getWater(), e->v1->getWater());
+				v->setWater(minWater + ((maxWater - minWater)/2));
 			}
-
+			
 			//if (!t->isRiver()) v->setZValue(heightMap->getIntensity(px, py) / 255);
 			
 			//cout << "Adding New Triangle " << t << " with "<<t->getEdges().size()<<" edges."<< endl;
@@ -526,13 +524,12 @@ void VoronoiHandler::addTriangles(vector<vVertexPoint*> triCenters, vector<vTria
 
 	// Mark all border polygons and make final list
 	for (vTriangle *t : newTriangles) {
-		t->updateBorder();
-		t->updateCenter(imageSize);
-		t->updateCorners(imageSize);
-		//if (t->isRiver()) t->updateCornerZ();
-		//else {
-		//	t->getCenter()->setZValue(heightMap->getIntensity(t->getCenter()->screenCoords.x, t->getCenter()->screenCoords.y) / 255);
-		//}
+		//t->updateBorder();
+		//t->updateCenter(imageSize);
+		//t->updateCorners(imageSize);
+
+		t->updateAll(imageSize);
+	
 		finalTriangles.push_back(t);
 	}
 
@@ -680,7 +677,7 @@ vector<vTriangle*> VoronoiHandler::generateVPolys(vector<vVertexPoint*> polyCent
 	for (vVertexPoint *p : polyCenters) {
 		//cout << "Building polygon from " << p->getEdges().size() << " edges..." << endl;
 		vTriangle *vPoly = new vTriangle(p,p->getEdges());
-		//cout << "Created new polygon with " << vPoly->getCorners().size() << " vertices, " << vPoly->getEdges().size() << " edges." << endl;
+		// << "Created new polygon with " << vPoly->getCorners().size() << " vertices, " << vPoly->getEdges().size() << " edges." << endl;
 		triangles.push_back(vPoly);
 		}	
 	return triangles;

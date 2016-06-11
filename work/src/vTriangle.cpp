@@ -144,6 +144,29 @@ void vTriangle::updateCenter(int imageSize) {
 	this->center->setScreenCoords(imageSize);
 }
 
+void vTriangle::updateAll(int imageSize) {
+	float centerX = 0.0;
+	float centerY = 0.0;
+	bool amRiver = false;
+
+	updateBorder();
+
+	for (vVertexPoint *p : corners) {
+		p->setScreenCoords(imageSize);
+		centerX += p->getCoords().x;
+		centerY += p->getCoords().y;
+		if (p->isRiver()) amRiver = true;
+	}
+	centerX = centerX / corners.size();
+	centerY = centerY / corners.size();
+
+	this->center->setCoords(centerX, centerY);
+	this->center->setScreenCoords(imageSize);
+
+	river = amRiver;
+
+}
+
 void vTriangle::removeNeighbour(vTriangle *t) {
 	vector<vTriangle*>::iterator itr;
 	itr = find(neighbours.begin(), neighbours.end(), t);
@@ -221,24 +244,10 @@ void vTriangle::addNeighbour(vTriangle *neighbour) {
 void vTriangle::updateCorners(int imageSize) {
 	for (vVertexPoint *c : corners) {
 		c->setScreenCoords(imageSize);
+
 	}
 }
 
-void vTriangle::updateCornerZ() {
-	//float minZ = min(corners.at(0)->getZValue(), min(corners.at(1)->getZValue(), corners.at(2)->getZValue()));
-	float minZ = 10000;
-	for (vVertexPoint *c : corners) {
-		cout << c->getZValue() << endl;
-		if (c->isRiver()) minZ = min(minZ, c->getZValue());
-	}
-	if (minZ < 10000) {
-		if (!corners.at(0)->isRiver()) corners.at(0)->setZValue(minZ);
-		if (!corners.at(1)->isRiver()) corners.at(0)->setZValue(minZ);
-		if (!corners.at(2)->isRiver()) corners.at(0)->setZValue(minZ);
-		center->setZValue(minZ);
-	}
-	
-}
 
 void vTriangle::setRiver(bool river, float water) {
 	this->river = river;

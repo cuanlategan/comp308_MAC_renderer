@@ -126,6 +126,10 @@ void vVertexPoint::setZValue(float zValue) {
 	this->zValue = zValue;
 }
 
+void vVertexPoint::applyWater(int waterScalar) {
+	zValue = zValue - (water*waterScalar);
+}
+
 vec2 vVertexPoint::getCoords() {
 	//cout << "Coords: " << coords << endl;
 	return this->coords;
@@ -208,4 +212,23 @@ void vVertexPoint::setScreenCoords(int imageSize) {
 	int y = coords.y * (imageSize - 1);
 
 	screenCoords = vec2(x, y);
+}
+
+float vVertexPoint::sampleWater() {
+
+	float waterVal = 0;
+	float maxWater = 0;
+	if (!river || water == 0){
+		int riverCount = 0;
+		for (vVertexPoint *n : neighbours) {
+			if (n->isRiver() && n->getWater() > 0) {
+				riverCount++;
+				waterVal += n->getWater();
+				maxWater = max(maxWater, n->getWater());
+				}
+			}
+		if (border) return maxWater;
+		else return waterVal / riverCount;
+		}
+		return water;
 }

@@ -229,3 +229,11 @@ vector<vVertexPoint*> splineHandler::makeRiverPointSpline(vector<vVertexPoint*> 
 	cout << "Actual final points: " << finalPoints.size() << endl;
 	return finalPoints;
 }
+
+int splineHandler::getSampleSize() {
+	return this->numberOfSamples;
+}
+
+void splineHandler::setSampleSize(int sampleSize) {
+	this->numberOfSamples = sampleSize;
+}
