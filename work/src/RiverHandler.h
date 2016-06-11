@@ -22,13 +22,15 @@ using namespace cimg_library;
 class RiverHandler {
 private:
 	int density = 50;
-	int numberOfRivers = 2;
+	int numberOfRivers = 1;
+	int maxRivers = numberOfRivers * 2;
 	int cutoffPercent = 5;
 	float startWater = 0;
 	float waterScalar = 1;
 	int widthScalar = 10;
 	float zScalar = 0.3;
 	int smoothPasses = 1;
+	int maxPasses = 2;
 	int complexMultiplier = density / 10;
 	int riverSamples = max(5, ((smoothPasses * complexMultiplier) + 1));
 	vector<int> sourcesUsed;
@@ -87,6 +89,8 @@ public:
 	Geometry* getGeo();
 	Geometry* makeGeo();
 	vector<vector<vec3>> returnRiverTris();
+	bool addRiver();
+	bool subdivide();
 	
 
 	//vector <vector<river>> returnRiverData(vector<vector<vVertexPoint*>>);

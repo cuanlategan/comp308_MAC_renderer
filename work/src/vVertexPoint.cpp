@@ -218,17 +218,24 @@ float vVertexPoint::sampleWater() {
 
 	float waterVal = 0;
 	float maxWater = 0;
-	if (!river || water == 0){
+	if (!river) {
 		int riverCount = 0;
 		for (vVertexPoint *n : neighbours) {
-			if (n->isRiver() && n->getWater() > 0) {
+			if ((n->isRiver() && n->getWater() > 0)) {
 				riverCount++;
 				waterVal += n->getWater();
 				maxWater = max(maxWater, n->getWater());
-				}
+				cout << "Found a river neighbour, max water = " << maxWater << ", waterVal = " << waterVal << endl;
 			}
-		if (border) return maxWater;
-		else return waterVal / riverCount;
+				if (!n->isRiver() && n->getWater() > 0){
+					waterVal += n->getWater();
+					maxWater = max(maxWater, n->getWater());
+					}
+				}
+			if (border) return maxWater;
+			if (riverCount > 0) return (waterVal / riverCount);
+			//return (waterVal / riverCount);
+			return (maxWater / 3);
 		}
 		return water;
 }

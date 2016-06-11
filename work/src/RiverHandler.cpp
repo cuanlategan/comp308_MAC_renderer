@@ -12,40 +12,20 @@ RiverHandler::RiverHandler() {
 	graph -> sampleImage(imageSize, heightMap);
 
 	this -> riverSources = findSourceCandidates(graph->getPolyVertices());
-	cout << "Found " << riverSources.size() << " river source candidates." << endl;
+	maxRivers = riverSources.size();
+	cout << "Found " << maxRivers << " river source candidates." << endl;
 	cout << "Making " << numberOfRivers << " rivers..." << endl;
 	this->rivers = makeRivers(numberOfRivers, riverSources);
-	cout << "Found " << rivers.size() << " rivers." << endl;
-
+	cout << "Carving rivers into Mesh...";
 	carveRivers(rivers, graph->getTriangles());
-	
+	cout << "Done." << endl;
+	cout << "Subdividing Mesh...";
 	for (int x = 0; x < smoothPasses; x++) {
 		graph->upRes();
 	}
+	cout << "Done." << endl;
 	graph->updateTriVertices();
-	rebuildHeightData(heightMap);
-
-	//graph->sampleImage(imageSize, heightMap);
-	int old = graph->getTriangles().size();
-	//graph->upRes(heightMap);
-	//graph->upRes(heightMap);
-	//graph->upRes();
-
-	cout << "Upping resolution from " << old << " faces to " << graph->getTriangles().size() << " faces." << endl;
-	//cout << "Generating geometry..." << endl;
-	//this->meshDisplay = makeGeo(graph->getTriangles());
-
-	//Some debug stuff under here
-	/*
-	for (vTriangle* t : graph->getTriangles()) {
-		cout << "Triangle " << t << " with " << t->getEdges().size() << " edges, and " << t->getCorners().size() << " corners." << endl;
-		for (vVertexPoint *c : t->getCorners()) {
-			cout << "\tCoords: " << c->getCoords();
-			cout << "\tScreenCoords: " << c->screenCoords << endl;
-		}
-	}
-	*/
-	
+	rebuildHeightData(heightMap);	
 }
 
 struct sortByGreaterZ {
@@ -200,6 +180,10 @@ vVertexPoint* RiverHandler::getNextRiverPoint(vVertexPoint *parent, vector<vVert
 		cout << "Mesh edge reached" << endl;
 		return next;
 	}
+
+	cout << "next->polycenter: "<< next->getPolyCenter() << endl;
+
+	if (next->getPolyCenter() == nullptr) cout << "point " << next->getCoords() << " does not have polycenter" << endl;
 
 	for (vTriangle *n : next->getPolyCenter()->getNeighbours()) {
 		n->setRiver(true, next->getWater());
@@ -620,4 +604,52 @@ vector<vector<vec3>> RiverHandler::returnRiverTris() {
 
 	}
 	return triData;
+}
+
+bool RiverHandler::addRiver() {
+	if (numberOfRivers + 1 > maxRivers) return false;
+
+	const int range = riverSources.size() - 1;
+	std::random_device rd1;
+	std::mt19937 gen1(rd1());
+	std::uniform_real_distribution<> dis(0, range);
+
+	int sanityCheck = 0;
+	int n = dis(gen1);
+
+	while (find(sourcesUsed.begin(), sourcesUsed.end(), n) != sourcesUsed.end() && sanityCheck <= riverSources.size()) {
+		sanityCheck++;
+		cout << "In this loop" << endl;
+		n = dis(gen1);
+	}		
+	if (sanityCheck == riverSources.size()) return false;
+	
+	sourcesUsed.push_back(n);
+
+	vVertexPoint *source = riverSources.at(n);
+
+	vector<vVertexPoint*> newRiver = makeRiverPath(source);
+
+	vector<vVertexPoint*> newRiverSpline = makeRiverSpline(newRiver, splineMaker->makeRiverSpline(newRiver));
+	rivers.push_back(newRiverSpline);
+
+	cout << "Adding a river of " << newRiverSpline.size() << " points." << endl;
+	graph->addTriangles(newRiverSpline, graph->getTriangles());
+
+	riverTris.clear();
+
+	for (vTriangle *t : graph->getTriangles()) {
+		if (t->isRiver()) {
+			riverTris.push_back(t);
+		}
+	}
+	return true;
+}
+
+bool RiverHandler::subdivide() {
+	if (smoothPasses + 1 > maxPasses) return false;
+	graph->upRes();
+	graph->updateTriVertices();
+	rebuildHeightData(heightMap);
+	return true;
 }
