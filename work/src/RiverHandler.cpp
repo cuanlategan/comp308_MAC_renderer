@@ -3,6 +3,7 @@
 
 RiverHandler::RiverHandler() {
 	heightMap = new Image("./work/res/textures/simplebump.png");
+	//heightMap = new Image("./work/res/textures/test_heightmap.png");
 
 	this -> graph = new VoronoiHandler(density,heightMap);
 	this->splineMaker = new splineHandler();
@@ -84,6 +85,7 @@ vector<vVertexPoint*>RiverHandler::findSourceCandidates(vector<vVertexPoint*> ri
 vector<vector<vVertexPoint*>> RiverHandler::makeRivers(int numberOfRivers, vector<vVertexPoint*> riverSources) {
 
 	vector<vector<vVertexPoint*>> rivers;
+	vector<vector<vVertexPoint*>> riverSplines;
 
 	if (riverSources.size() < numberOfRivers) numberOfRivers = riverSources.size();
 
@@ -92,21 +94,31 @@ vector<vector<vVertexPoint*>> RiverHandler::makeRivers(int numberOfRivers, vecto
 	std::mt19937 gen1(rd1());
 	std::uniform_real_distribution<> dis(0, range);
 
-
-
+	//int sanityCheck = 0;
+	int n = dis(gen1);
 	for (int x = 0; x < numberOfRivers; x++) {
-		int n = dis(gen1);
+		while (find(sourcesUsed.begin(), sourcesUsed.end(), n) != sourcesUsed.end()) {
+			cout << "In this loop" << endl;
+			n = dis(gen1);
+		}
 		cout << "Random source index = " << n << endl;
+		sourcesUsed.push_back(n);
 		// int n = rand() % (riverSources.size() - 1);
 		vVertexPoint *source = riverSources.at(n);
 
 		vector<vVertexPoint*> newRiver = makeRiverPath(source);
-		vector<vVertexPoint*> newRiverSpline = makeRiverSpline(newRiver, splineMaker->makeRiverSpline(newRiver));
+		
 		rivers.push_back(newRiver);
-		rivers.push_back(newRiverSpline);
+		
 	}
+
+	for (vector<vVertexPoint*> r : rivers) {
+		vector<vVertexPoint*> newRiverSpline = makeRiverSpline(r, splineMaker->makeRiverSpline(r));
+		riverSplines.push_back(newRiverSpline);
+	}
+
 	cout << "Made " << rivers.size() << " rivers" << endl;
-	return rivers;
+	return riverSplines;
 }
 
 // Generate a single river
@@ -333,7 +345,7 @@ vector<vVertexPoint*> RiverHandler::makeRiverSpline(vector<vVertexPoint*> contro
 	cout << "sampleSize = " << sampleSize << endl;
 
 	for (int x = 0; x < controls.size() - 1; x++) {
-		//cout << "Pushing control point " << x << endl;
+		cout << "Pushing control point " << x << endl;
 		spline.push_back(controls.at(x));
 		cout << "River point at: " << spline.back()->getCoords() << endl;
 		int splineIndex = (x * sampleSize);

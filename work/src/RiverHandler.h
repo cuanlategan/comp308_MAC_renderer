@@ -27,10 +27,11 @@ private:
 	float startWater = 0;
 	float waterScalar = 1;
 	int widthScalar = 10;
-	int zScalar = 2;
-	int smoothPasses = 2;
-	int complexMultiplier = density / 100;
+	float zScalar = 0.3;
+	int smoothPasses = 1;
+	int complexMultiplier = density / 10;
 	int riverSamples = max(5, ((smoothPasses * complexMultiplier) + 1));
+	vector<int> sourcesUsed;
 
 	
 	// int finalDensity = 600 - density - (numberOfRivers * (density / 4));
@@ -38,9 +39,9 @@ private:
 
 	//Image heightMap = Image("./work/res/textures/test_heightmap.png");
 	Image *heightMap;
-	CImg<unsigned char> drawheightMap = CImg<unsigned char>("./work/res/textures/simplebump.pgm");
-	int imageSize = drawheightMap.width();
-	//int imageSize = 1024;
+	//CImg<unsigned char> drawheightMap = CImg<unsigned char>("./work/res/textures/simplebump.pgm");
+	//int imageSize = drawheightMap.width();
+	int imageSize = 1024;
 	Geometry *meshDisplay = nullptr;
 
 	VoronoiHandler *graph;
@@ -76,7 +77,7 @@ private:
 	void rebuildHeightData(Image*);
 
 	vector<vector<vector<float>>> returnRiverPaths();
-	vector<vector<vec3>> returnRiverTris();
+	
 	
 
 public:
@@ -85,7 +86,7 @@ public:
 	void drawAll();
 	Geometry* getGeo();
 	Geometry* makeGeo();
-
+	vector<vector<vec3>> returnRiverTris();
 	
 
 	//vector <vector<river>> returnRiverData(vector<vector<vVertexPoint*>>);
