@@ -92,7 +92,7 @@ void Field::generateCluster(Geometry *geo) {
         std::cout << "area: " << area << "\n";*/
 
         //cgra::vec3 ran = getRandomVertOnFace(triPoint1, triPoint2, triPoint3);
-        for (float i = 0; i < area; i += 0.00003f) {
+        for (float i = 0; i < area; i += 0.00005f) {
             cgra::vec3 ran = getRandomVertOnFace(triPoint1, triPoint2, triPoint3);
             //ran.x *= 60;
             //ran.z *= 60;

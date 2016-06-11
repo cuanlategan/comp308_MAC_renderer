@@ -44,7 +44,7 @@ GLFWwindow *g_window;
 // Projection values
 //
 float g_fovy = 60.0;
-float g_znear = 0.01;
+float g_znear = 0.005;
 float g_zfar = 100.0;
 
 
