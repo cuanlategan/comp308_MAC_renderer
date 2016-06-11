@@ -12,6 +12,13 @@
 //
 //----------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+//
+// Additional constructor that takes std::vector<std::vector<cgra::vec3>>
+// added by Mark Kuggeleijn, 2016
+//
+//----------------------------------------------------------------------------
+
 #include <cmath>
 #include <iostream> // input/output streams
 #include <fstream>  // file streams
@@ -52,14 +59,35 @@ Geometry::Geometry(std::vector<std::vector<cgra::vec3>> triangles) {
 	for (std::vector<cgra::vec3> t : triangles) {
 		vertex v0, v1, v2;
 
+		float maxX = max(t.at(0).x, max(t.at(1).x, t.at(2).x));
+		float minX = min(t.at(0).x, min(t.at(1).x, t.at(2).x));
+		float maxY = max(t.at(0).y, max(t.at(1).y, t.at(2).y));
+		float minY = min(t.at(0).y, min(t.at(1).y, t.at(2).y));
+
+		double dx = maxX - minX;
+		double dy = maxY - minY;
+
 		m_points.push_back(t.at(0));
 		v0.p = m_points.size()-1;
-
+	
 		m_points.push_back(t.at(1));
 		v1.p = m_points.size() - 1;
 
 		m_points.push_back(t.at(2));
 		v2.p = m_points.size() - 1;
+
+		vec2 uv0(((t.at(0).x - minX) / dx), ((t.at(0).y - minY) / dy));
+		m_uvs.push_back(uv0);
+		v0.t = m_uvs.size() - 1;
+
+		vec2 uv1(((t.at(1).x - minX) / dx), ((t.at(1).y - minY) / dy));
+		m_uvs.push_back(uv1);
+		v1.t = m_uvs.size() - 1;
+
+		vec2 uv2(((t.at(2).x - minX) / dx), ((t.at(2).y - minY) / dy));
+		m_uvs.push_back(uv2);
+		v2.t = m_uvs.size() - 1;
+
 
 		//cout << "Adding " << t.at(0) << ", " << t.at(1) << "," << t.at(2) << endl;
 

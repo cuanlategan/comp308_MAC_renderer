@@ -225,7 +225,7 @@ float vVertexPoint::sampleWater() {
 				riverCount++;
 				waterVal += n->getWater();
 				maxWater = max(maxWater, n->getWater());
-				cout << "Found a river neighbour, max water = " << maxWater << ", waterVal = " << waterVal << endl;
+				//cout << "Found a river neighbour, max water = " << maxWater << ", waterVal = " << waterVal << endl;
 			}
 				if (!n->isRiver() && n->getWater() > 0){
 					waterVal += n->getWater();

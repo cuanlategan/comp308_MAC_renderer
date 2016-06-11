@@ -29,7 +29,7 @@ private:
 	float waterScalar = 1;
 	int widthScalar = 10;
 	float zScalar = 0.3;
-	int smoothPasses = 1;
+	int smoothPasses = 0;
 	int maxPasses = 2;
 	int complexMultiplier = density / 10;
 	int riverSamples = max(5, ((smoothPasses * complexMultiplier) + 1));

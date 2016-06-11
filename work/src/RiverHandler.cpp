@@ -324,14 +324,14 @@ vector<vVertexPoint*> RiverHandler::makeRiverSpline(vector<vVertexPoint*> contro
 	splinePoints.erase(splinePoints.begin() + 1);
 	splinePoints.erase(splinePoints.end() - 1);
 
-	cout << "controlPoints.size() = " << controls.size() << endl;
-	cout << "splinePoints.size() = " << splinePoints.size() << endl;
-	cout << "sampleSize = " << sampleSize << endl;
+	//cout << "controlPoints.size() = " << controls.size() << endl;
+	//cout << "splinePoints.size() = " << splinePoints.size() << endl;
+	//cout << "sampleSize = " << sampleSize << endl;
 
 	for (int x = 0; x < controls.size() - 1; x++) {
-		cout << "Pushing control point " << x << endl;
+		//cout << "Pushing control point " << x << endl;
 		spline.push_back(controls.at(x));
-		cout << "River point at: " << spline.back()->getCoords() << endl;
+		//cout << "River point at: " << spline.back()->getCoords() << endl;
 		int splineIndex = (x * sampleSize);
 		for (int y = splineIndex; y < splineIndex + sampleSize; y++) {
 			//cout << "y = " << y << endl;
@@ -341,16 +341,16 @@ vector<vVertexPoint*> RiverHandler::makeRiverSpline(vector<vVertexPoint*> contro
 			// need to set screen coords?
 			spline.back()->setDownstream(r);
 			spline.push_back(r);
-			cout << "River point at: " << spline.back()->getCoords() << endl;
+			//cout << "River point at: " << spline.back()->getCoords() << endl;
 		}
 	}
 	
 	spline.back()->setDownstream(controls.back());
 	//cout << "Pushing control point " << controls.size()-1 << endl;
 	spline.push_back(controls.back());
-	cout << "River point at: " << spline.back()->getCoords() << endl;
+	//cout << "River point at: " << spline.back()->getCoords() << endl;
 
-	cout << "spline.size() = " << spline.size() << endl << endl;
+	//cout << "spline.size() = " << spline.size() << endl << endl;
 
 	return spline;
 }
@@ -494,19 +494,24 @@ Geometry* RiverHandler::makeGeo() {
 	for (vTriangle* t : graph->getTriangles()) {
 	vector<vec3> data;
 
-	// corners are sorted in anticlockwise, need clockwise for obj formatting
-	vec2 p0 = t->getCorners().at(2)->getCoords();
+	// corners are sorted in clockwise.
+	vec2 p0 = t->getCorners().at(0)->getCoords();
 	vec2 p1 = t->getCorners().at(1)->getCoords();
-	vec2 p2 = t->getCorners().at(0)->getCoords();
+	vec2 p2 = t->getCorners().at(2)->getCoords();
 
-	float p0z = t->getCorners().at(2)->getZValue() * zScalar;
+	float p0z = t->getCorners().at(0)->getZValue() * zScalar;
 	float p1z = t->getCorners().at(1)->getZValue()* zScalar;
-	float p2z = t->getCorners().at(0)->getZValue()* zScalar;
+	float p2z = t->getCorners().at(2)->getZValue()* zScalar;
+
+
+	//vec3 tp0(p0.x, p0z, p0.y);
+	//vec3 tp1(p1.x, p1z, p1.y);
+	//vec3 tp2(p2.x, p2z, p2.y);
 
 	// I changed this -- Cuan
 	vec3 tp0(p0.x, p0.y, p0z); //vec3 tp0(p0.x, p0z, p0.y);
 	vec3 tp1(p1.x, p1.y, p1z); //vec3 tp1(p1.x, p1z, p1.y);
-	vec3 tp2(p2.x, p2.y, p2z ); //vec3 tp2(p2.x, p2z, p2.y);
+	vec3 tp2(p2.x, p2.y, p2z); //vec3 tp2(p2.x, p2z, p2.y);
 
 
 
