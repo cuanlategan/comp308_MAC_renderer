@@ -503,14 +503,10 @@ Geometry* RiverHandler::makeGeo() {
 	float p1z = t->getCorners().at(1)->getZValue()* zScalar;
 	float p2z = t->getCorners().at(0)->getZValue()* zScalar;
 
-
-	//vec3 tp0(p0.x, p0z, p0.y);
-	//vec3 tp1(p1.x, p1z, p1.y);
-	//vec3 tp2(p2.x, p2z, p2.y);
-	vec3 tp0(p0.x, p0.y, p0z);
-	vec3 tp1(p1.x, p1.y, p1z);
-	vec3 tp2(p2.x, p2.y, p2z );
-
+	// I changed this -- Cuan
+	vec3 tp0(p0.x, p0.y, p0z); //vec3 tp0(p0.x, p0z, p0.y);
+	vec3 tp1(p1.x, p1.y, p1z); //vec3 tp1(p1.x, p1z, p1.y);
+	vec3 tp2(p2.x, p2.y, p2z ); //vec3 tp2(p2.x, p2z, p2.y);
 
 
 
