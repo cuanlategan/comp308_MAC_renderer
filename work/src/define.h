@@ -30,6 +30,11 @@ GLfloat mat_chrome_diffuse[] = {0.4f, 0.4f, 0.4f, 1.f};
 GLfloat mat_chrome_specular[] = {0.774597f, 0.774597f, 0.774597f, 1.f};
 GLfloat mat_chrome_shininess[] = {76.8f};
 
+GLfloat mat_white_ground_ambient[] = { 0.f, 0.f, 0.f, 1.f };
+GLfloat mat_white_ground_specular[] = { 1.f, 1.f, 1.f, 1.f };
+GLfloat mat_white_ground_diffuse[] = { 1.f, 1.f, 1.f, 1.f };
+GLfloat mat_white_ground_shininess[] = { 20.f };
+
 //=====================================================================
 //                      LIGHTING
 //=====================================================================
