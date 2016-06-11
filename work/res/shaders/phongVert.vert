@@ -2,12 +2,11 @@
 
 
 varying vec2 vTextureCoord0;
+varying vec3 vNormal;
 
 attribute vec3 attr_center;
 
-uniform float wavelength, amplitude, steepnes, speed, dirX, dirY;
-//uniform vec2 direction;
-uniform float time;
+uniform float time, wavelength, amplitude, steepnes, speed, dirX, dirY;
 
 const float PI = 3.14159265359;
 
@@ -17,9 +16,10 @@ vec4 calcGerstnerWave(float frequency, float QA, float amplitude, vec3 position,
 
 void main(void)
 {
-    //gl_TexCoord[0] = gl_MultiTexCoord0;
+
     vTextureCoord0 = gl_MultiTexCoord0.xy;
 
+    vNormal = normalize(gl_NormalMatrix * gl_Normal);
 
    if(gl_MultiTexCoord0.y > .9)
    {
@@ -38,7 +38,6 @@ void main(void)
       phase_con = freq*speed;
       QA = (steepnes*1.2)*(amplitude*1.3);
       result += calcGerstnerWave(freq, QA,amplitude,attr_center, dir, time, phase_con);
-
       dir = vec2(dirY*-0.77,dirX*-0.77);
       freq = 2*PI/(wavelength*1.3);
       phase_con = freq*speed;
@@ -71,6 +70,3 @@ vec4 calcGerstnerWave(float frequency, float QA, float amplitude, vec3 position,
 
         return  vec4(QA*direction.x*c, QA*direction.y*c, amplitude*s, 0.0);
     }
-
-
-

@@ -38,7 +38,7 @@ GLfloat full_white[] = {1.f,1.f,1.f,1.f};
 // weak ambient
 GLfloat light_0_position[] = {0.0f, 0.0f, 1.0f, 0.0f}; // TODO wheres position??
 GLfloat light_0_diffintensity[] = {0.7, 0.7, 0.7, 1.0, 1.0f};
-GLfloat light_0_ambient[] = {0.2, 0.2, 0.2 , 1.0f};
+GLfloat light_0_ambient[] = {0.7, 0.7, 0.7 , 1.0f};
 //GLfloat light_0_ambient[] = {1.f, 1.f, 1.f, 1.f};
 
 // spot light

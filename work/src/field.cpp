@@ -15,6 +15,11 @@ void Field::BuildVBOs() {
     // Load The Data
     glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_points->size() * sizeof(float) * 3, m_points->data(), GL_DYNAMIC_DRAW_ARB);
 
+    glGenBuffers(1, &m_nVBONormals);                  // Get A Valid Name
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_nVBONormals);         // Bind The Buffer
+    // Load The Data
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_normals->size() * sizeof(float) * 3, m_normals->data(), GL_DYNAMIC_DRAW_ARB);
+
     // Generate And Bind The Texture Coordinate Buffer
     glGenBuffersARB(1, &m_nVBOTexCoords);                 // Get A Valid Name
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_nVBOTexCoords);        // Bind The Buffer
@@ -62,44 +67,6 @@ cgra::vec3 Field::getRandomVertOnFace(cgra::vec3 p1, cgra::vec3 p2, cgra::vec3 p
 void Field::generateCluster(Geometry *geo) {
 
 
-
-
-    /* for(auto& tri: geo->getTriangles()){
-         for(int i=0; i<3; i++){
-
-
-             *//*cgra::vec3 triPoint = geo->getPoints().at(tri.v[i].p);
-            //glScalef(10.0, 1.0, 10.0);
-            triPoint.x *= 60;
-            triPoint.z *= 60;
-            cgra::vec3 rotatedPoint(triPoint.x,triPoint.z,triPoint.y);*//*
-
-            cgra::vec3 triPoint = geo->getPoints().at(tri.v[0].p);
-            //glScalef(10.0, 1.0, 10.0);
-            triPoint.x *= 60;
-            triPoint.z *= 60;
-            cgra::vec3 rotatedPoint(triPoint.x,triPoint.z,triPoint.y);
-
-            Grass grass(rotatedPoint);
-            grass_clusters->push_back(grass);
-
-
-            for (auto &point :grass.getPoints()) {
-                m_points->push_back(point);
-
-                cgra::vec3 center(grass.getPosition().x,
-                                  grass.getPosition().y,
-                                  grass.getPosition().z);
-                m_centers->push_back(center);
-                //std::cout << center << "\n";
-            }
-
-            for (auto &uv :grass.getUvs()) {
-                m_uvs->push_back(uv);
-            }
-
-        }
-    }*/
     for (auto &tri: geo->getTriangles()) {
 
 
@@ -181,6 +148,7 @@ void Field::generateCluster(int num_clusters) {
                                   grass.getPosition().y,
                                   grass.getPosition().z);
                 m_centers->push_back(center);
+                m_normals->push_back(cgra::vec3(0.f,1.f,0.f));
                 //std::cout << center << "\n";
             }
 
@@ -242,6 +210,7 @@ void Field::renderFieldShader(WaveGenerator *wave_gen, float time, GLint shader)
     glUniform1f(glGetUniformLocation(shader, "amplitude"), 0.005f);
     glUniform1f(glGetUniformLocation(shader, "steepnes"), 0.8f);
     glUniform1f(glGetUniformLocation(shader, "speed"), 0.05f);
+    glUniform1i(glGetUniformLocation(shader, "hasTex"), 1);
 
     //GLfloat dir[2] = {1.f, 1.f};
     //glUniform2fv(glGetUniformLocation(shader, "direction"), 2, dir);
@@ -251,9 +220,13 @@ void Field::renderFieldShader(WaveGenerator *wave_gen, float time, GLint shader)
 
     glEnableClientState(GL_VERTEX_ARRAY);                        // Enable Vertex Arrays
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
 
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_nVBOVertices);
     glVertexPointer(3, GL_FLOAT, 0, 0);       // Set The Vertex Pointer To The Vertex Buffer
+
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_nVBONormals);
+    glNormalPointer(GL_FLOAT, 0, 0);     // Set The Normal Pointer To The TexCoord Buffer
 
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_nVBOTexCoords);
     glTexCoordPointer(2, GL_FLOAT, 0, 0);     // Set The TexCoord Pointer To The TexCoord Buffer
@@ -281,7 +254,8 @@ void Field::renderFieldShader(WaveGenerator *wave_gen, float time, GLint shader)
 
     // Disable Pointers
     glDisableClientState(GL_VERTEX_ARRAY);                    // Disable Vertex Arrays
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);                // Disable Texture Coord Arrays
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);// Disable Texture Coord Arrays
 
     glDisable(GL_TEXTURE_2D);
     glActiveTexture(GL_TEXTURE0);
