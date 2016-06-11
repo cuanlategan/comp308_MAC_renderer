@@ -423,8 +423,8 @@ void render(int width, int height) {
         }
         glDisable(GL_COLOR_MATERIAL);
 
-
-        // cuan
+/*
+        /*//*//* cuan
         if (draw_grass) {
             glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
             glColor3f(1.0f, 1.0f, 1.0f); //red
@@ -433,7 +433,7 @@ void render(int width, int height) {
             glMaterialfv(GL_FRONT, GL_SHININESS, mat_bronze_shininess);
             glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_bronze_diffuse);
             field->renderField(g_wave_generator, t);
-        }
+        }*/
         if (draw_points) { field->renderGrid(g_wave_generator, t); }
 
         // drawWater();
@@ -452,14 +452,15 @@ void render(int width, int height) {
             // Render geometry
             glPushMatrix();
             {
-                //glScalef(10.0, 10.0, 10.0);
-                //glTranslatef(0,0,-.5);
+                //glScalef(60.0, 5.0, 60.0);
+                //glTranslatef(0,0,-1);
                 glRotatef(-90, 1, 0, 0);
                 g_geometry->renderGeometry();
 
             }
             glPopMatrix();
         }
+        glDisable(GL_COLOR_MATERIAL);
 
 
         glUseProgram(g_phong_sdr);
