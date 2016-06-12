@@ -230,6 +230,28 @@ vVertexPoint* RiverHandler::getNextRiverPoint(vVertexPoint *parent, vector<vVert
 
 //}
 
+void RiverHandler::drawLowRezMesh() {
+	CImgDisplay draw_disp(lowRezDisplay, "Low Rez Mesh");
+	while (!draw_disp.is_closed()) {
+		draw_disp.wait();
+	}
+}
+
+void RiverHandler::drawRiverMesh() {
+	CImgDisplay draw_disp(riverDisplay, "River Mesh");
+	while (!draw_disp.is_closed()) {
+		draw_disp.wait();
+	}
+}
+
+void RiverHandler::drawFullMesh() {
+	CImgDisplay draw_disp(fullMeshDisplay, "Full Mesh");
+	while (!draw_disp.is_closed()) {
+		draw_disp.wait();
+	}
+
+}
+
 void RiverHandler::drawAll() {
 	//CImg stuff, needed for testing
 	const unsigned char cRed[] = { 255,0,0 };
@@ -253,8 +275,7 @@ void RiverHandler::drawAll() {
 	//drawPoints(graph->getPolyVertices(), &pointDisplay, cGrey ,cDarkGrey, radius);
 	drawPolygons(graph->getTriangles(), &pointDisplay, cGrey, cRed, radius);
 	drawPoints(riverSources, &pointDisplay, cYellow, cRed, radius);
-	//drawRivers(rivers, &pointDisplay, cWhite, cWhite,radius);
-	//drawRiverSplines(rivers, &pointDisplay, cWhite, cWhite, radius);
+
 
 	CImgDisplay draw_disp(fullMeshDisplay, "Raw Mesh");
 	while (!draw_disp.is_closed()) {
@@ -284,61 +305,8 @@ void RiverHandler::drawPoints(vector<vVertexPoint*> points, CImg<unsigned char> 
 	}
 
 }
-void RiverHandler::drawRivers(vector<vector<vVertexPoint*>> riverSet, CImg<unsigned char> *pointDisplay, const unsigned char lineColor[], const unsigned char nodeColor[], int radius) {
-	for (vector<vVertexPoint*> river : riverSet) {
-		for (vVertexPoint* r : river) {
-			//cout << "Riverpoint " << r << " at " << r->screenCoords << endl;
-			int p0x = r->screenCoords.x;
-			int p0y = r->screenCoords.y;
-			pointDisplay->draw_circle(p0x, p0y, radius, nodeColor);
-			if (!r->isBorder()) {
-				int p1x = r->getDownstream()->screenCoords.x;
-				int p1y = r->getDownstream()->screenCoords.y;
-				int points[4] = { p0x, p0y, p1x, p1y };
-				//cout << "Riverline: " << points << endl;
-				pointDisplay->draw_line(points[0], points[1], points[2], points[3], lineColor);
-			}
-		}
-	}
-
-}
 
 
-void RiverHandler::drawRiverSplines(vector<vector<vVertexPoint*>> riverSet, CImg<unsigned char> *pointDisplay, const unsigned char lineColor[], const unsigned char nodeColor[], int radius) {
-	for (vector<vVertexPoint*> river : riverSet) {
-
-		for (vVertexPoint* r : river) {
-			//cout << "Riverpoint " << r << " at " << r->screenCoords << endl;
-			int p0x = r->screenCoords.x;
-			int p0y = r->screenCoords.y;
-			pointDisplay->draw_circle(p0x, p0y, radius, nodeColor);
-		}
-
-		if (river.size() == 2) {
-			vec2 p0 = river.at(0)->getCoords();
-			vec2 p1 = river.at(1)->getCoords();
-			pointDisplay->draw_line(p0.x, p0.y, p1.x, p1.y, lineColor);
-		} else if (river.size() > 2) {
-			vector<vec4> riverSpline = splineMaker->makeRiverSpline(river);
-			for (int x = 1; x < riverSpline.size() - 3; x++) {
-				vec4 p0 = riverSpline.at(x);
-				vec4 p1 = riverSpline.at(x+1);
-
-				int p0x = p0.x * (imageSize - 1);
-				int p0y = p0.y * (imageSize - 1);
-				int p1x = p1.x * (imageSize - 1);
-				int p1y = p1.y * (imageSize - 1);
-
-				//pointDisplay->draw_line(p0x, p0y, p1x, p1y, lineColor);
-
-			}
-	
-		}
-
-
-	}
-
-}
 
 vector<vVertexPoint*> RiverHandler::makeRiverSpline(vector<vVertexPoint*> controls, vector<vec4> splinePoints) {
 	
@@ -396,32 +364,6 @@ void RiverHandler::carveRivers(vector<vector<vVertexPoint*>> rivers, vector<vTri
 
 }
 
-void RiverHandler::drawRiversGL(){
-
-	for (vector<vVertexPoint*> river : rivers) {
-
-		if (river.size() > 1) {
-			vector<vec4> riverSpline = splineMaker->makeRiverSpline(river);
-			for (int x = 1; x < riverSpline.size() - 3; x++) {
-				vec4 p0 = riverSpline.at(x);
-				vec4 p1 = riverSpline.at(x+1);
-				float width = p0.z*widthScalar;
-
-				glLineWidth(width);
-				glBegin(GL_LINES);
-					glVertex2f(p0.x, p0.y);
-					glVertex2f(p1.x, p1.y);
-				glEnd();
-
-
-			}
-
-		}
-
-
-	}
-
-}
 
 void RiverHandler::drawPolygons(vector<vTriangle*> polys, CImg<unsigned char> *pointDisplay, const unsigned char lineColor[], const unsigned char nodeColor[], int radius) {
 	//cout << "Drawing " << polys.size() << " polygons."<<endl;
@@ -462,6 +404,7 @@ void RiverHandler::drawPolygons(vector<vTriangle*> polys, CImg<unsigned char> *p
 		}
 	}
 }
+// Old makegeo class
 
 Geometry* RiverHandler::makeGeo(vector<vTriangle*> triangles) {
 
@@ -514,54 +457,40 @@ Geometry* RiverHandler::makeGeo() {
 	Geometry *geoData = nullptr;
 
 	vector<vector<vec3>> triData;
-	
-	for (vTriangle* t : graph->getTriangles()) {
-	vector<vec3> data;
+	riverTriIndex.clear();
 
-	// corners are sorted in clockwise.
-	vec2 p0 = t->getCorners().at(0)->getCoords();
-	vec2 p1 = t->getCorners().at(1)->getCoords();
-	vec2 p2 = t->getCorners().at(2)->getCoords();
+	//for (vTriangle* t : graph->getTriangles()) {
+	for (int x = 0; x < graph->getTriangles().size() - 1; x++){
+		vTriangle *t = graph->getTriangles().at(x);
+		if (t->isRiver()) riverTriIndex.push_back(x+1);
+		vector<vec3> data;
 
-	float p0z = t->getCorners().at(0)->getZValue() * zScalar;
-	float p1z = t->getCorners().at(1)->getZValue()* zScalar;
-	float p2z = t->getCorners().at(2)->getZValue()* zScalar;
+		// corners are sorted in clockwise.
+		vec2 p0 = t->getCorners().at(0)->getCoords();
+		vec2 p1 = t->getCorners().at(1)->getCoords();
+		vec2 p2 = t->getCorners().at(2)->getCoords();
 
-
-	//vec3 tp0(p0.x, p0z, p0.y);
-	//vec3 tp1(p1.x, p1z, p1.y);
-	//vec3 tp2(p2.x, p2z, p2.y);
-
-	// I changed this -- Cuan
-	vec3 tp0(p0.x, p0.y, p0z); //vec3 tp0(p0.x, p0z, p0.y);
-	vec3 tp1(p1.x, p1.y, p1z); //vec3 tp1(p1.x, p1z, p1.y);
-	vec3 tp2(p2.x, p2.y, p2z); //vec3 tp2(p2.x, p2z, p2.y);
+		float p0z = t->getCorners().at(0)->getZValue() * zScalar;
+		float p1z = t->getCorners().at(1)->getZValue()* zScalar;
+		float p2z = t->getCorners().at(2)->getZValue()* zScalar;
 
 
+		//vec3 tp0(p0.x, p0z, p0.y);
+		//vec3 tp1(p1.x, p1z, p1.y);
+		//vec3 tp2(p2.x, p2z, p2.y);
 
-	data.push_back(tp0);
-	data.push_back(tp1);
-	data.push_back(tp2);
+		// I changed this -- Cuan
+		vec3 tp0(p0.x, p0.y, p0z); //vec3 tp0(p0.x, p0z, p0.y);
+		vec3 tp1(p1.x, p1.y, p1z); //vec3 tp1(p1.x, p1z, p1.y);
+		vec3 tp2(p2.x, p2.y, p2z); //vec3 tp2(p2.x, p2z, p2.y);
 
-	triData.push_back(data);
+		data.push_back(tp0);
+		data.push_back(tp1);
+		data.push_back(tp2);
 
-	} 
+		triData.push_back(data);
 
-	/*
-	vector<vec3> tData;
-	//vector<vector<vec3>> triData;
-
-	vec3 p0(10.0, 10.0, 0.0);
-	vec3 p1(10.0, -10.0, 0.0);
-	vec3 p2(-10.0, 10.0, 0.0);
-
-	tData.push_back(p0);
-	tData.push_back(p1);
-	tData.push_back(p2);
-
-	triData.push_back(tData);
-	*/
-
+		} 
 	geoData = new Geometry(triData);
 	//geoData = new Geometry("./work/res/assets/bunny.obj");
 	return geoData;
@@ -603,6 +532,11 @@ vector<vector<vector<float>>> RiverHandler::returnRiverPaths() {
 
 	return pathData;
 }
+
+vector<int> RiverHandler::returnRiverTriIndex() {
+	return riverTriIndex;
+}
+
 vector<vector<vec3>> RiverHandler::returnRiverTris() {
 	vector<vector<vec3>> triData;
 
