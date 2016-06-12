@@ -25,6 +25,7 @@ SET(headers
 	"imageLoader.hpp"
 	"CImg.h"
 	"splineHandler.hpp"
+	"skybox.h"
 	"RiverRenderer.hpp"
 
 	"bluenoise/geom.hpp"
@@ -48,7 +49,7 @@ SET(sources
 	"RiverRenderer.cpp"
 
 	"bluenoise/geom.cpp"
-	"bluenoise/sample.cpp")
+	"bluenoise/sample.cpp" )
 
 # Add executable target and link libraries
 # You do not need to touch this

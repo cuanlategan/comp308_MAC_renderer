@@ -15,7 +15,6 @@ void main(void)
    eyeVec = -vVertex;
 
 
-
    spotLightDir = vec3(gl_LightSource[3].position.xyz - vVertex);
    dirLightDir = vec3(gl_LightSource[2].position.xyz);
    pointLightDir = vec3(gl_LightSource[3].position.xyz - vVertex);

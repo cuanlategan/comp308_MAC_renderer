@@ -30,6 +30,7 @@
 #include "wave_generator.h"
 #include "field.h"
 #include "RiverHandler.h"
+#include "skybox.h"
 #include "RiverRenderer.hpp"
 
 // FIXME this module is logically broken
@@ -66,6 +67,7 @@ vec3 g_camera_eye(0.f, 0.f, 0.f);
 bool g_useShader = true;
 GLuint g_phong_sdr = 0;
 GLuint g_ground_tex = 0;
+GLuint g_cubemap_tex = 0;
 
 // Rivermap texture
 GLuint g_rivermap = 0;
@@ -78,7 +80,10 @@ Geometry *g_geometry = nullptr;
 // Marks River Gen
 RiverHandler *g_riverHandler;
 bool wireframe = false;
-bool drawGraph = false;
+bool drawLowRezGraph = false;
+bool drawRiverGraph = false;
+bool drawFullGraph = false;
+
 bool drawGround = true;
 bool drawWater = false;
 float t = 0.f;
@@ -211,15 +216,17 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
         if (action == 1) wireframe = !wireframe;
     }
     if (key == 265) { // key up-arrow
-        if (action == 1) drawGraph = true;
+        if (action == 1) drawFullGraph = true;
     }
     if (key == 264) { // key down-arrow
         if (action == 1) drawGround = !drawGround;
     }
     if (key == 263) { // key left-arrow
-        if (action == 1) drawWater = !drawWater;
+        if (action == 1) drawLowRezGraph = true;
+        //if (action == 1) drawWater = !drawWater;
     }
     if (key == 262) { // key right-arrow
+        if (action == 1) drawRiverGraph = true;
 
     }
 
@@ -248,25 +255,25 @@ void initLight() {
     if (draw_ambiant_light) {
         //GLfloat ambiant_pos[] = {g_camera_eye.x, g_camera_eye.y, g_camera_eye.z, 0.0f}; // TODO wheres position??
         glLightModelfv(GL_LIGHT_MODEL_AMBIENT, mark_ambient);
-        //glLightfv(GL_LIGHT0, GL_POSITION, light_0_position); //keep default z dir //TODO
+        glLightfv(GL_LIGHT0, GL_POSITION, mark_light_direction); //keep default z dir //TODO
         //glLightfv(GL_LIGHT0, GL_DIFFUSE, mark);
-        //glLightfv(GL_LIGHT0, GL_AMBIENT, light_0_ambient);
+        glLightfv(GL_LIGHT0, GL_AMBIENT, light_0_ambient);
         glEnable(GL_LIGHT0);
     } else { glDisable(GL_LIGHT0); }
 
     if (draw_spot_light) {
-        /*glLightfv(GL_LIGHT1, GL_POSITION, light_1_position);
+        glLightfv(GL_LIGHT1, GL_POSITION, light_1_position);
         glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, light_1_direction);
         glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, spot_cutoff);
         glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 2.5f);
         glLightfv(GL_LIGHT1, GL_DIFFUSE, light_1_diffintensity);
-        glLightfv(GL_LIGHT1, GL_AMBIENT, light_1_ambient);
+        //glLightfv(GL_LIGHT1, GL_AMBIENT, light_1_ambient);
         glLightfv(GL_LIGHT1, GL_SPECULAR, light_1_specular);
-        glEnable(GL_LIGHT1);*/
+        glEnable(GL_LIGHT1);
     } else { glDisable(GL_LIGHT1); }
 
     if (draw_directional_light) {
-        //glLightfv(GL_LIGHT2, GL_POSITION, light_1_position);
+        glLightfv(GL_LIGHT2, GL_POSITION, light_1_position);
         glLightfv(GL_LIGHT2, GL_SPOT_DIRECTION, light_2_direction);
         glLightfv(GL_LIGHT2, GL_DIFFUSE, light_2_diffintensity);
         //glLightfv(GL_LIGHT2, GL_AMBIENT, light_2_ambient);
@@ -288,23 +295,29 @@ void initLight() {
 //
 void initTexture() {
 
+    glPushMatrix();
+    {
+        glMatrixMode(GL_TEXTURE);
+        glLoadIdentity();
+        glScalef(20.f, 20.f, 20.f);
+        Image tex_ground("./work/res/textures/ground_texture.jpg");
+        glGenTextures(1, &g_ground_tex); // Generate texture ID
 
+        glBindTexture(GL_TEXTURE_2D, g_ground_tex); // Bind it as a 2D texture
+        // Finnaly, actually fill the data into our texture
+        gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, tex_ground.w, tex_ground.h, tex_ground.glFormat(), GL_UNSIGNED_BYTE,
+                          tex_ground.dataPointer());
 
-    Image tex_ground("./work/res/textures/ground_texture.jpg");
-    glGenTextures(1, &g_ground_tex); // Generate texture ID
+        //glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,tex_grass.w,tex_grass.h,0,GL_RGBA,GL_UNSIGNED_BYTE,tex_grass.dataPointer());
 
-    glBindTexture(GL_TEXTURE_2D, g_ground_tex); // Bind it as a 2D texture
-    // Finnaly, actually fill the data into our texture
-    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, tex_ground.w, tex_ground.h, tex_ground.glFormat(), GL_UNSIGNED_BYTE,
-                      tex_ground.dataPointer());
+        // Setup sampling strategies
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    }
+    glPopMatrix();
 
-    //glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,tex_grass.w,tex_grass.h,0,GL_RGBA,GL_UNSIGNED_BYTE,tex_grass.dataPointer());
-
-    // Setup sampling strategies
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
 }
 
@@ -392,13 +405,24 @@ void render(int width, int height) {
     }
 
 
-    if (drawGraph) {
-        g_riverHandler->drawAll();
-        drawGraph = false;
+    if (drawLowRezGraph) {
+        g_riverHandler->drawLowRezMesh();
+        drawLowRezGraph = false;
     }
 
+    if (drawRiverGraph) {
+        g_riverHandler->drawRiverMesh();
+        drawRiverGraph = false;
+    }
+
+    if (drawFullGraph) {
+        g_riverHandler->drawFullMesh();
+        drawFullGraph = false;
+    }
+
+
     // Grey/Blueish background
-    glClearColor(0.3f, 0.3f, 0.4f, 1.0f);
+    glClearColor(0.25f, 0.25f, 0.6f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
@@ -424,10 +448,17 @@ void render(int width, int height) {
             glMaterialfv(GL_FRONT, GL_SPECULAR, mat_white_ground_specular);
             glMaterialfv(GL_FRONT, GL_SHININESS, mat_white_ground_shininess);
             glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_white_ground_diffuse);
-            if (wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+            if (wireframe) {
+                glColor3f(1.0f, 0.0f, 0.0f); //red
+                glDisable(GL_TEXTURE_2D);
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            }
+
             // Render geometry
             glPushMatrix();
             {
+                glEnable(GL_TEXTURE_2D);
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, g_ground_tex);
                 glRotatef(-90, 1, 0, 0);
@@ -472,8 +503,10 @@ void render(int width, int height) {
             // Render geometry
             glPushMatrix();
             {
-                //glScalef(60.0, 5.0, 60.0);
-                //glTranslatef(0,0,-1);
+                glEnable(GL_TEXTURE_2D);
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, g_ground_tex);
+
                 glRotatef(-90, 1, 0, 0);
                 g_geometry->renderGeometry();
 
@@ -484,7 +517,17 @@ void render(int width, int height) {
 
 
         glUseProgram(g_phong_sdr);
-        if (draw_grass) { field->renderFieldShader(g_wave_generator, t, g_phong_sdr); }
+        if (draw_grass) {
+
+            // Set the current material (for all objects) to red
+            glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+            //glColor3f(1.0f, 0.0f, 0.0f); //red
+            glMaterialfv(GL_FRONT, GL_AMBIENT, mat_white_ground_ambient);
+            glMaterialfv(GL_FRONT, GL_SPECULAR, mat_white_ground_specular);
+            glMaterialfv(GL_FRONT, GL_SHININESS, mat_white_ground_shininess);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_white_ground_diffuse);
+            field->renderFieldShader(g_wave_generator, t, g_phong_sdr);
+        }
         glUseProgram(0);
 
         glEnable(GL_COLOR_MATERIAL);
@@ -513,9 +556,31 @@ void drawLights() {
 
     glPushMatrix();
     {
+
+        glColor3f(1.f, 0.f, 0.f);
+        glBegin(GL_LINES);
+        {
+            glVertex3f(0, -10, 0);
+            glVertex3f(0,10,0);
+        }
+        glEnd();
+        glColor3f(0.f, 1.f, 0.f);
+        glBegin(GL_LINES);
+        {
+            glVertex3f(-10,0, 0);
+            glVertex3f(10,0,0);
+        }
+        glEnd();
+        glColor3f(0.f, 0.f, 1.f);
+        glBegin(GL_LINES);
+        {
+            glVertex3f(0, 0, -10);
+            glVertex3f(0,0,10);
+        }
+        glEnd();
+
         glColor3f(1.f, 1.f, 1.f);
         glMaterialfv(GL_FRONT, GL_AMBIENT, full_white);
-
         //rotate cone
         glPushMatrix();
         {
@@ -656,13 +721,17 @@ int main(int argc, char **argv) {
 
 
     g_wave_generator = new WaveGenerator();
-    g_wave_generator->addGerstnerWave(4.567, 0.3, 0.8, 1.5, vec2(-.3f, 1.f));
+    //g_wave_generator->addGerstnerWave(4.567, 0.3, 0.8, 1.5, vec2(-.3f, 1.f));
     //g_wave_generator->addGerstnerWave(7.685,0.2,.8,1.5,vec2(-.35f, 0.8f));
     //g_wave_generator->addGerstnerWave(2.2,0.1,.1,1.5,vec2(0.f, -1.0f));
     //g_wave_generator->addGerstnerWave(16.2,1.0,.75,2.5,vec2(0.f, 1.0f));
+
+    g_wave_generator->addGerstnerWave(13.3, 0.5, 0.8, 1.5, vec2(1.3f, 0.f));
+    g_wave_generator->addGerstnerWave(13.3*.77, 0.5*.77, 0.8*.77, 1.5, vec2(1.3f*.77, 0.f));
+    g_wave_generator->addGerstnerWave(13.3*1.33, 0.5*1.33, 0.8*1.33, 1.5, vec2(1.3f*1.33, 0.f));
     field = new Field();
     //field->generateCluster(GRID_DIMENSION);
-    field->generateCluster(g_geometry);
+    field->generateCluster(g_geometry, g_riverHandler);
     field->generateGrid(GRID_DIMENSION);
 
 

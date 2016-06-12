@@ -5,6 +5,9 @@
 #include "field.h"
 #include "simple_image.hpp"
 #include "geometry.hpp"
+#include "RiverHandler.h"
+
+
 
 
 void Field::BuildVBOs() {
@@ -64,67 +67,91 @@ cgra::vec3 Field::getRandomVertOnFace(cgra::vec3 p1, cgra::vec3 p2, cgra::vec3 p
     return result;
 }
 
-void Field::generateCluster(Geometry *geo) {
+bool Field::checkRiverFace(int triIndex,Geometry *geo , vector<int> riverTris) {
 
 
+    if (find(riverTris.begin(), riverTris.end(), triIndex) != riverTris.end()) {
+        cout << "checkRiverFace: River face found\n";
+        return true;
+    }
+
+    /*for(auto & tri: riverTris){
+        cgra::vec3 rivPoint1 = tri.at(0);
+        cgra::vec3 rivPoint2 = tri.at(1);
+        cgra::vec3 rivPoint3 = tri.at(2);
+
+        //cout << "rivPoint1: " << rivPoint1 << "  triPoint1: " << triPoint1 << endl;
+        //cout << "rivPoint2: " << rivPoint2 << endl;
+        //cout << "rivPoint3: " << rivPoint3 << endl;
+
+        if((triPoint3.x == rivPoint3.x ))
+        {
+            cout << "checkRiverFace: River face found\n";
+            return true;
+        }
+    }
+*/
+
+    return false;
+}
+
+
+void Field::generateCluster(Geometry *geo, RiverHandler *riverHandler) {
+
+    int index = -1;
     for (auto &tri: geo->getTriangles()) {
-
+        index++;
 
         cgra::vec3 triPoint1 = geo->getPoints().at(tri.v[0].p);
-        /*triPoint1.x *= 10;
-        triPoint1.z *= 10;
-        triPoint1.y *= 10;*/
         cgra::vec3 triPoint2 = geo->getPoints().at(tri.v[1].p);
-        /*triPoint2.x *= 10;
-        triPoint2.z *= 10;
-        triPoint2.y *= 10;*/
         cgra::vec3 triPoint3 = geo->getPoints().at(tri.v[2].p);
-        /*triPoint3.x *= 10;
-        triPoint3.z *= 10;
-        triPoint3.y *= 10;*/
 
-        //float height = float(fabs(triPoint1.y - triPoint2.y));
-        //float base = float(fabs(triPoint3.x - triPoint2.x));
-        //float area = 0.5f * base * height;
+        if(!checkRiverFace(index, geo, riverHandler->returnRiverTriIndex()))
+        {
+            //float height = float(fabs(triPoint1.y - triPoint2.y));
+            //float base = float(fabs(triPoint3.x - triPoint2.x));
+            //float area = 0.5f * base * height;
 
-        cgra::vec3 e1(triPoint2.x-triPoint1.x,triPoint2.y-triPoint1.y,triPoint2.z-triPoint1.z);
-        cgra::vec3 e2(triPoint3.x-triPoint1.x,triPoint3.y-triPoint3.y,triPoint3.z-triPoint1.z);
-        cgra::vec3 e3 = cgra::cross(e1,e2);
-        float area = 0.5*cgra::length(e3);
+            cgra::vec3 e1(triPoint2.x-triPoint1.x,triPoint2.y-triPoint1.y,triPoint2.z-triPoint1.z);
+            cgra::vec3 e2(triPoint3.x-triPoint1.x,triPoint3.y-triPoint3.y,triPoint3.z-triPoint1.z);
+            cgra::vec3 e3 = cgra::cross(e1,e2);
+            float area = 0.5*cgra::length(e3);
 
-        /*std::cout << "height: " << height << "\n";
-        std::cout << "base: " << base << "\n";
-        std::cout << "area: " << area << "\n";*/
+            /*std::cout << "height: " << height << "\n";
+            std::cout << "base: " << base << "\n";
+            std::cout << "area: " << area << "\n";*/
 
-        //cgra::vec3 ran = getRandomVertOnFace(triPoint1, triPoint2, triPoint3);
-        for (float i = 0; i < area; i += 0.00005f) {
-            cgra::vec3 ran = getRandomVertOnFace(triPoint1, triPoint2, triPoint3);
-            //ran.x *= 60;
-            //ran.z *= 60;
-            cgra::vec3 rotatedPoint(ran.x, ran.y, ran.z);
-            //std::cout <<"cuan rotated and scaled: " << rotatedPoint << "\n";
+            //cgra::vec3 ran = getRandomVertOnFace(triPoint1, triPoint2, triPoint3);
+            for (float i = 0; i < area; i += 0.00004f) {
+                cgra::vec3 ran = getRandomVertOnFace(triPoint1, triPoint2, triPoint3);
 
-            Grass grass(rotatedPoint);
-            grass_clusters->push_back(grass);
+                cgra::vec3 rotatedPoint(ran.x, ran.y, ran.z);
+                //std::cout <<"cuan rotated and scaled: " << rotatedPoint << "\n";
+
+                Grass grass(rotatedPoint);
+                grass_clusters->push_back(grass);
 
 
-            for (auto &point :grass.getPoints()) {
-                m_points->push_back(point);
+                for (auto &point :grass.getPoints()) {
+                    m_points->push_back(point);
 
-                cgra::vec3 center(grass.getPosition().x,
-                                  grass.getPosition().y,
-                                  grass.getPosition().z);
-                m_centers->push_back(center);
-                //std::cout << center << "\n";
+                    cgra::vec3 center(grass.getPosition().x,
+                                      grass.getPosition().y,
+                                      grass.getPosition().z);
+                    m_centers->push_back(center);
+                    //std::cout << center << "\n";
+                }
+
+                for (auto &uv :grass.getUvs()) {
+                    m_uvs->push_back(uv);
+                }
             }
 
-            for (auto &uv :grass.getUvs()) {
-                m_uvs->push_back(uv);
-            }
+
         }
 
-
     }
+
 
     BuildVBOs();
 
@@ -209,6 +236,8 @@ void Field::renderFieldShader(WaveGenerator *wave_gen, float time, GLint shader)
 
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GREATER, 0.5f);
+
+
 
     glUniform1f(glGetUniformLocation(shader, "time"), time); // set time uniform in shaders
     glUniform1f(glGetUniformLocation(shader, "wavelength"), 0.133);
@@ -330,4 +359,8 @@ void Field::initGrassTexture() {
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
 }
+
+
+
+
 

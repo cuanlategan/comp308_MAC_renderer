@@ -16,8 +16,8 @@ RiverHandler::RiverHandler() {
 	const unsigned char cDarkGrey[] = { 64,64,64 };
 	const unsigned char cYellow[] = { 255,255,0 };
 
-	heightMap = new Image("./work/res/textures/simplebump.png");
-	//heightMap = new Image("./work/res/textures/test_heightmap.png");
+	//heightMap = new Image("./work/res/textures/simplebump.png");
+	heightMap = new Image("./work/res/textures/test_heightmap.png");
 
 	this -> graph = new VoronoiHandler(density,heightMap);
 	this->splineMaker = new splineHandler();

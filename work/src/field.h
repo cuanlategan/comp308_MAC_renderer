@@ -12,6 +12,7 @@
 #include "grid.h"
 #include "cuan_define.h"
 #include "geometry.hpp"
+#include "RiverHandler.h"
 
 class Field {
 private:
@@ -67,9 +68,14 @@ public:
 
     void initGrassTexture();
 
-    void generateCluster(Geometry *geo);
-
     cgra::vec3 getRandomVertOnFace(cgra::vec3 a, cgra::vec3 b, cgra::vec3 c);
+
+    void generateCluster(Geometry *geo, RiverHandler *riverHandler);
+
+
+    bool checkRiverFace(triangle &tri, Geometry *geo, vector<vector<vec3>> riverHandler);
+
+    bool checkRiverFace(int triIndex, Geometry *geo, vector<int> riverTris);
 };
 
 
