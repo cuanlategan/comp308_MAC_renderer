@@ -35,6 +35,8 @@ private:
 	int riverSamples = max(5, ((smoothPasses * complexMultiplier) + 1));
 	vector<int> sourcesUsed;
 
+
+
 	
 	// int finalDensity = 600 - density - (numberOfRivers * (density / 4));
 	int finalDensity = 50;
@@ -53,6 +55,11 @@ private:
 	vector<vector<vVertexPoint*>> rivers;
 	vector<vTriangle*> riverTris;
 
+	CImg<unsigned char> lowRezDisplay;
+	CImg<unsigned char> riverDisplay;
+	CImg<unsigned char> fullMeshDisplay;
+
+	int drawRadius = 2;
 	//bool sortByZ(vVertexPoint*, vVertexPoint*) const;
 	
 	vector<vVertexPoint*> findSourceCandidates(vector<vVertexPoint*>);
