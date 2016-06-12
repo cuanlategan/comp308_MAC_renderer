@@ -25,6 +25,7 @@ SET(headers
 	"imageLoader.hpp"
 	"CImg.h"
 	"splineHandler.hpp"
+	"RiverRenderer.hpp"
 
 	"bluenoise/geom.hpp"
 	"bluenoise/sample.hpp")
@@ -44,6 +45,7 @@ SET(sources
 	"vTriangle.cpp"
 	"vVertexPoint.cpp"
 	"splineHandler.cpp"
+	"RiverRenderer.cpp"
 
 	"bluenoise/geom.cpp"
 	"bluenoise/sample.cpp")

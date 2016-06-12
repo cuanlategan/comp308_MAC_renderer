@@ -30,6 +30,7 @@
 #include "wave_generator.h"
 #include "field.h"
 #include "RiverHandler.h"
+#include "RiverRenderer.hpp"
 
 // FIXME this module is logically broken
 /*#include "bluenoise/sample.hpp"*/
@@ -79,6 +80,7 @@ RiverHandler *g_riverHandler;
 bool wireframe = false;
 bool drawGraph = false;
 bool drawGround = true;
+bool drawWater = false;
 float t = 0.f;
 
 bool draw_lights = true;
@@ -215,7 +217,7 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
         if (action == 1) drawGround = !drawGround;
     }
     if (key == 263) { // key left-arrow
-
+        if (action == 1) drawWater = !drawWater;
     }
     if (key == 262) { // key right-arrow
 
@@ -324,18 +326,35 @@ void initShader() {
 // FIXME significant logical errors in blue noise generation. 
 //
 //sampler *g_riverSurface;
+vector<vector<riverSegment>> riverPaths;
 
 void initWater() {
     // FIXME
     /*g_riverSurface = new sampler(0.01);
     g_riverSurface->fillSpace();*/
+    // Sample river data
+    vector<riverSegment> river1;
+    float riverSegment1[13] = {1.0, 1.0, 1.0, 1.0, 0.0,
+                     2.0, 1.0, 2.0, 2.0, 0.0,
+                     0.5, 0.0, 1.0};
+    river1.push_back(riverSegment(vec3(1.0, 1.0, 1.0), vec2(0.0, 1.0),
+                                    vec3(2.0, 1.0, 2.0), vec2(0.0, 2.0),
+                                    0.5, vec2(1.0, 0.0)));
+    float riverSegment2[13] = {2.0, 1.0, 2.0, 2.0, 2.0,
+                                3.0, 3.0, 3.0, 2.5, 2.5,
+                                0.2, 0.5, 0.5};
+    river1.push_back(riverSegment(vec3(2.0, 1.0, 2.0), vec2(2.0, 2.0),
+                                vec3(3.0, 3.0, 3.0), vec2(2.5, 2.5),
+                                0.5, vec2(0.4, 0.6)));
+    riverPaths.push_back(river1);
 }
 
 // Renders the rivers and it's flowing water
 // For now just doing dots
 //
-void drawWater() {
-    // TODO render river geometry with animated shader
+void renderWater() {
+    // TODO add animated shader
+    renderRivers(riverPaths);
 }
 
 
@@ -429,7 +448,8 @@ void render(int width, int height) {
         }*/
         if (draw_points) { field->renderGrid(g_wave_generator, t); }
 
-        drawWater();
+        glEnable(GL_COLOR_MATERIAL);
+        if (drawWater) renderWater();
 
         glFlush();
 
@@ -460,7 +480,8 @@ void render(int width, int height) {
         if (draw_grass) { field->renderFieldShader(g_wave_generator, t, g_phong_sdr); }
         glUseProgram(0);
 
-        drawWater();
+        glEnable(GL_COLOR_MATERIAL);
+        if (drawWater) renderWater();
 
         glFlush();
 
