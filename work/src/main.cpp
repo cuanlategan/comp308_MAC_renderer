@@ -63,7 +63,7 @@ vec3 g_camera_eye(0.f, 0.f, 0.f);
 //
 bool g_useShader = true;
 GLuint g_phong_sdr = 0;
-GLuint g_grass_tex = 0;
+GLuint g_ground_tex = 0;
 
 // Rivermap texture
 GLuint g_rivermap = 0;
@@ -243,39 +243,38 @@ void charCallback(GLFWwindow *win, unsigned int c) {
 void initLight() {
 
     if (draw_ambiant_light) {
-        GLfloat ambiant_pos[] = {g_camera_eye.x, g_camera_eye.y, g_camera_eye.z, 0.0f}; // TODO wheres position??
-        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, light_0_ambient);
-        glLightfv(GL_LIGHT0, GL_POSITION, ambiant_pos); //keep default z dir //TODO
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, light_0_diffintensity);
-        glLightfv(GL_LIGHT0, GL_AMBIENT, light_0_ambient);
+        //GLfloat ambiant_pos[] = {g_camera_eye.x, g_camera_eye.y, g_camera_eye.z, 0.0f}; // TODO wheres position??
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, mark_ambient);
+        //glLightfv(GL_LIGHT0, GL_POSITION, light_0_position); //keep default z dir //TODO
+        //glLightfv(GL_LIGHT0, GL_DIFFUSE, mark);
+        //glLightfv(GL_LIGHT0, GL_AMBIENT, light_0_ambient);
         glEnable(GL_LIGHT0);
     } else { glDisable(GL_LIGHT0); }
 
     if (draw_spot_light) {
-        glLightfv(GL_LIGHT1, GL_POSITION, light_1_position);
+        /*glLightfv(GL_LIGHT1, GL_POSITION, light_1_position);
         glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, light_1_direction);
         glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, spot_cutoff);
         glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 2.5f);
         glLightfv(GL_LIGHT1, GL_DIFFUSE, light_1_diffintensity);
         glLightfv(GL_LIGHT1, GL_AMBIENT, light_1_ambient);
         glLightfv(GL_LIGHT1, GL_SPECULAR, light_1_specular);
-        glEnable(GL_LIGHT1);
+        glEnable(GL_LIGHT1);*/
     } else { glDisable(GL_LIGHT1); }
 
     if (draw_directional_light) {
         //glLightfv(GL_LIGHT2, GL_POSITION, light_1_position);
         glLightfv(GL_LIGHT2, GL_SPOT_DIRECTION, light_2_direction);
         glLightfv(GL_LIGHT2, GL_DIFFUSE, light_2_diffintensity);
-        glLightfv(GL_LIGHT2, GL_AMBIENT, light_2_ambient);
+        //glLightfv(GL_LIGHT2, GL_AMBIENT, light_2_ambient);
         glLightfv(GL_LIGHT2, GL_SPECULAR, light_2_specular);
         glEnable(GL_LIGHT2);
     } else { glDisable(GL_LIGHT2); }
 
     if (draw_point_light) {
         glLightfv(GL_LIGHT3, GL_POSITION, light_3_position);
-        glLightfv(GL_LIGHT3, GL_DIFFUSE, light_3_diffintensity);
-        glLightfv(GL_LIGHT3, GL_AMBIENT, light_3_ambient);
-        glLightfv(GL_LIGHT3, GL_SPECULAR, light_3_specular);
+        glLightfv(GL_LIGHT3, GL_DIFFUSE, mark_point_diffintensity);
+        glLightfv(GL_LIGHT3, GL_SPECULAR, mark_point_specular);
         glEnable(GL_LIGHT3);
     } else { glDisable(GL_LIGHT3); }
 
@@ -288,13 +287,13 @@ void initTexture() {
 
 
 
-    /*Image tex_grass("./work/res/textures/tall-grass3.png");
-    glGenTextures(1, &g_grass_tex); // Generate texture ID
+    Image tex_ground("./work/res/textures/ground_texture.jpg");
+    glGenTextures(1, &g_ground_tex); // Generate texture ID
 
-    glBindTexture(GL_TEXTURE_2D, g_grass_tex); // Bind it as a 2D texture
+    glBindTexture(GL_TEXTURE_2D, g_ground_tex); // Bind it as a 2D texture
     // Finnaly, actually fill the data into our texture
-    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, tex_grass.w, tex_grass.h, tex_grass.glFormat(), GL_UNSIGNED_BYTE,
-                      tex_grass.dataPointer());
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, tex_ground.w, tex_ground.h, tex_ground.glFormat(), GL_UNSIGNED_BYTE,
+                      tex_ground.dataPointer());
 
     //glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,tex_grass.w,tex_grass.h,0,GL_RGBA,GL_UNSIGNED_BYTE,tex_grass.dataPointer());
 
@@ -302,7 +301,7 @@ void initTexture() {
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);*/
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
 }
 
@@ -408,13 +407,17 @@ void render(int width, int height) {
         if (drawGround) {
             // Set the current material (for all objects) to red
             glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-            glColor3f(1.0f, 0.0f, 0.0f); //red
+            //glColor3f(1.0f, 0.0f, 0.0f); //red
+            glMaterialfv(GL_FRONT, GL_AMBIENT, mat_white_ground_ambient);
+            glMaterialfv(GL_FRONT, GL_SPECULAR, mat_white_ground_specular);
+            glMaterialfv(GL_FRONT, GL_SHININESS, mat_white_ground_shininess);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_white_ground_diffuse);
             if (wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             // Render geometry
             glPushMatrix();
             {
-                //glScalef(60.0, 5.0, 60.0);
-                //glTranslatef(0,0,-1);
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, g_ground_tex);
                 glRotatef(-90, 1, 0, 0);
                 g_geometry->renderGeometry();
 
@@ -447,7 +450,11 @@ void render(int width, int height) {
         if (drawGround) {
             // Set the current material (for all objects) to red
             glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-            glColor3f(1.0f, 0.0f, 0.0f); //red
+            //glColor3f(1.0f, 0.0f, 0.0f); //red
+            glMaterialfv(GL_FRONT, GL_AMBIENT, mat_white_ground_ambient);
+            glMaterialfv(GL_FRONT, GL_SPECULAR, mat_white_ground_specular);
+            glMaterialfv(GL_FRONT, GL_SHININESS, mat_white_ground_shininess);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_white_ground_diffuse);
             if (wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             // Render geometry
             glPushMatrix();

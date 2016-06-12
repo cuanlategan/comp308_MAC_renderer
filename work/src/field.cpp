@@ -83,9 +83,14 @@ void Field::generateCluster(Geometry *geo) {
         triPoint3.z *= 10;
         triPoint3.y *= 10;*/
 
-        float height = float(fabs(triPoint1.y - triPoint2.y));
-        float base = float(fabs(triPoint3.x - triPoint2.x));
-        float area = 0.5f * base * height;
+        //float height = float(fabs(triPoint1.y - triPoint2.y));
+        //float base = float(fabs(triPoint3.x - triPoint2.x));
+        //float area = 0.5f * base * height;
+
+        cgra::vec3 e1(triPoint2.x-triPoint1.x,triPoint2.y-triPoint1.y,triPoint2.z-triPoint1.z);
+        cgra::vec3 e2(triPoint3.x-triPoint1.x,triPoint3.y-triPoint3.y,triPoint3.z-triPoint1.z);
+        cgra::vec3 e3 = cgra::cross(e1,e2);
+        float area = 0.5*cgra::length(e3);
 
         /*std::cout << "height: " << height << "\n";
         std::cout << "base: " << base << "\n";

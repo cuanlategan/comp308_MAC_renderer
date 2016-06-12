@@ -30,10 +30,10 @@ GLfloat mat_chrome_diffuse[] = {0.4f, 0.4f, 0.4f, 1.f};
 GLfloat mat_chrome_specular[] = {0.774597f, 0.774597f, 0.774597f, 1.f};
 GLfloat mat_chrome_shininess[] = {76.8f};
 
-GLfloat mat_white_ground_ambient[] = { 0.f, 0.f, 0.f, 1.f };
-GLfloat mat_white_ground_specular[] = { 1.f, 1.f, 1.f, 1.f };
-GLfloat mat_white_ground_diffuse[] = { 1.f, 1.f, 1.f, 1.f };
-GLfloat mat_white_ground_shininess[] = { 20.f };
+GLfloat mat_white_ground_ambient[] = { 0.6f, 0.6f, 0.6f, 1.f };
+GLfloat mat_white_ground_specular[] = { 0.5f, 0.5f, 0.5f, 1.f };
+GLfloat mat_white_ground_diffuse[] = { 0.1f, 0.1f, 0.1f, 1.f };
+GLfloat mat_white_ground_shininess[] = { 5.f };
 
 //=====================================================================
 //                      LIGHTING
@@ -41,7 +41,7 @@ GLfloat mat_white_ground_shininess[] = { 20.f };
 GLfloat full_white[] = {1.f,1.f,1.f,1.f};
 
 // weak ambient
-GLfloat light_0_position[] = {0.0f, 0.0f, 1.0f, 0.0f}; // TODO wheres position??
+GLfloat light_0_position[] = {0.0f, 1.0f, 1.0f, 0.0f}; // TODO wheres position??
 GLfloat light_0_diffintensity[] = {0.7, 0.7, 0.7, 1.0, 1.0f};
 GLfloat light_0_ambient[] = {0.7, 0.7, 0.7 , 1.0f};
 //GLfloat light_0_ambient[] = {1.f, 1.f, 1.f, 1.f};
