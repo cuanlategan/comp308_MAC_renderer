@@ -2,12 +2,29 @@
 
 
 RiverHandler::RiverHandler() {
+
+	lowRezDisplay = CImg<unsigned char>(imageSize, imageSize, 1, 3, 0);
+	riverDisplay = CImg<unsigned char>(imageSize, imageSize, 1, 3, 0);
+	fullMeshDisplay = CImg<unsigned char>(imageSize, imageSize, 1, 3, 0);
+
+	const unsigned char cRed[] = { 255,0,0 };
+	const unsigned char cBlue[] = { 0,0,255 };
+	const unsigned char cDarkBlue[] = { 0,0,100 };
+	const unsigned char cWhite[] = { 255,255,255 };
+	const unsigned char cBlack[] = { 0,0,0 };
+	const unsigned char cGrey[] = { 127,127,127 };
+	const unsigned char cDarkGrey[] = { 64,64,64 };
+	const unsigned char cYellow[] = { 255,255,0 };
+
 	heightMap = new Image("./work/res/textures/simplebump.png");
 	//heightMap = new Image("./work/res/textures/test_heightmap.png");
 
 	this -> graph = new VoronoiHandler(density,heightMap);
 	this->splineMaker = new splineHandler();
 	splineMaker->setSampleSize(riverSamples);
+
+	drawEdges(graph->getPolyEdges(), &lowRezDisplay, cBlue);
+	drawEdges(graph->getTriEdges(), &lowRezDisplay, cRed);
 
 	graph -> sampleImage(imageSize, heightMap);
 
@@ -16,6 +33,10 @@ RiverHandler::RiverHandler() {
 	cout << "Found " << maxRivers << " river source candidates." << endl;
 	cout << "Making " << numberOfRivers << " rivers..." << endl;
 	this->rivers = makeRivers(numberOfRivers, riverSources);
+
+	drawPolygons(graph->getTriangles(), &riverDisplay, cGrey, cRed, drawRadius);
+	//drawRivers(rivers, &riverDisplay, cBlue, cWhite, drawRadius);
+
 	cout << "Carving rivers into Mesh...";
 	carveRivers(rivers, graph->getTriangles());
 	cout << "Done." << endl;
@@ -25,6 +46,9 @@ RiverHandler::RiverHandler() {
 	}
 	cout << "Done." << endl;
 	graph->updateTriVertices();
+
+	drawPolygons(graph->getTriangles(), &fullMeshDisplay, cGrey, cRed, drawRadius);
+
 	rebuildHeightData(heightMap);	
 }
 
@@ -232,7 +256,7 @@ void RiverHandler::drawAll() {
 	//drawRivers(rivers, &pointDisplay, cWhite, cWhite,radius);
 	//drawRiverSplines(rivers, &pointDisplay, cWhite, cWhite, radius);
 
-	CImgDisplay draw_disp(pointDisplay, "Raw Mesh");
+	CImgDisplay draw_disp(fullMeshDisplay, "Raw Mesh");
 	while (!draw_disp.is_closed()) {
 		draw_disp.wait();
 	}
@@ -586,18 +610,18 @@ vector<vector<vec3>> RiverHandler::returnRiverTris() {
 		vector<vec3> data;
 
 		// corners are sorted in anticlockwise, need clockwise for obj formatting
-		vec2 p0 = t->getCorners().at(2)->getCoords();
+		vec2 p0 = t->getCorners().at(0)->getCoords();
 		vec2 p1 = t->getCorners().at(1)->getCoords();
-		vec2 p2 = t->getCorners().at(0)->getCoords();
+		vec2 p2 = t->getCorners().at(2)->getCoords();
 
-		float p0z = t->getCorners().at(2)->getZValue() * zScalar;
+		float p0z = t->getCorners().at(0)->getZValue() * zScalar;
 		float p1z = t->getCorners().at(1)->getZValue()* zScalar;
-		float p2z = t->getCorners().at(0)->getZValue()* zScalar;
+		float p2z = t->getCorners().at(2)->getZValue()* zScalar;
 
 
-		vec3 tp0(p0.x, p0z, p0.y);
-		vec3 tp1(p1.x, p1z, p1.y);
-		vec3 tp2(p2.x, p2z, p2.y);
+		vec3 tp0(p0.x, p0.y, p0z); //vec3 tp0(p0.x, p0z, p0.y);
+		vec3 tp1(p1.x, p1.y, p1z); //vec3 tp1(p1.x, p1z, p1.y);
+		vec3 tp2(p2.x, p2.y, p2z); //vec3 tp2(p2.x, p2z, p2.y);
 
 		data.push_back(tp0);
 		data.push_back(tp1);
