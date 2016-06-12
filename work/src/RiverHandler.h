@@ -29,11 +29,12 @@ private:
 	float waterScalar = 1;
 	int widthScalar = 10;
 	float zScalar = 0.3;
-	int smoothPasses = 0;
+	int smoothPasses = 1;
 	int maxPasses = 2;
 	int complexMultiplier = density / 10;
 	int riverSamples = max(5, ((smoothPasses * complexMultiplier) + 1));
 	vector<int> sourcesUsed;
+	vector<int> riverTriIndex;
 
 
 
@@ -72,8 +73,6 @@ private:
 	
 	void drawEdges(vector<vEdge*>, CImg<unsigned char>*, const unsigned char[]);
 	void drawPoints(vector<vVertexPoint*>, CImg<unsigned char>*, const unsigned char[], const unsigned char[],int);
-	void drawRivers(vector<vector<vVertexPoint*>>, CImg<unsigned char>*, const unsigned char[], const unsigned char[], int);
-	void drawRiverSplines(vector<vector<vVertexPoint*>>, CImg<unsigned char>*, const unsigned char[], const unsigned char[], int);
 	
 	void drawPolygons(vector<vTriangle*>, CImg<unsigned char>*, const unsigned char[], const unsigned char[], int);
 
@@ -91,11 +90,16 @@ private:
 
 public:
 	RiverHandler();
-	void drawRiversGL();
 	void drawAll();
+
+	void drawLowRezMesh();
+	void drawRiverMesh();
+	void drawFullMesh();
+
 	Geometry* getGeo();
 	Geometry* makeGeo();
 	vector<vector<vec3>> returnRiverTris();
+	vector<int> returnRiverTriIndex();
 	bool addRiver();
 	bool subdivide();
 	

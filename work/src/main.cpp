@@ -31,7 +31,8 @@
 #include "field.h"
 #include "RiverHandler.h"
 
-#include "bluenoise/sample.hpp"
+// FIXME this module is logically broken
+/*#include "bluenoise/sample.hpp"*/
 
 using namespace std;
 using namespace cgra;
@@ -319,29 +320,21 @@ void initShader() {
 }
 
 // Initializes the blue noise sampler and other useful resources for rendering water
+// FIXME significant logical errors in blue noise generation. 
 //
-sampler *g_riverSurface;
+//sampler *g_riverSurface;
 
 void initWater() {
-    g_riverSurface = new sampler(0.01);
-    cout << "." << endl;
-    g_riverSurface->fillSpace();
-    cout << "!" << endl;
+    // FIXME
+    /*g_riverSurface = new sampler(0.01);
+    g_riverSurface->fillSpace();*/
 }
 
 // Renders the rivers and it's flowing water
 // For now just doing dots
 //
 void drawWater() {
-    vector<vec2> points = g_riverSurface->allPoints();
-    glColor3f(0, 1, 1);
-
-    glBegin(GL_POINTS);
-    for (int i = 0; i < points.size(); i++) {
-        cout << ".";
-        glVertex3f(points[i].x, points[i].y, 0);
-    }
-    glEnd();
+    // TODO render river geometry with animated shader
 }
 
 
@@ -439,7 +432,7 @@ void render(int width, int height) {
         }*/
         if (draw_points) { field->renderGrid(g_wave_generator, t); }
 
-        // drawWater();
+        drawWater();
 
         glFlush();
 
@@ -474,7 +467,7 @@ void render(int width, int height) {
         if (draw_grass) { field->renderFieldShader(g_wave_generator, t, g_phong_sdr); }
         glUseProgram(0);
 
-        // drawWater();
+        drawWater();
 
         glFlush();
 
@@ -652,9 +645,7 @@ int main(int argc, char **argv) {
     field->generateGrid(GRID_DIMENSION);
 
 
-    cout << "HELLO" << endl;
-    //initWater();
-    cout << "WORLD" << endl;
+    initWater();
 
 
     double lastTime = glfwGetTime();
