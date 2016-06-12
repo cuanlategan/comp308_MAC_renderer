@@ -76,16 +76,21 @@ Geometry::Geometry(std::vector<std::vector<cgra::vec3>> triangles) {
 		m_points.push_back(t.at(2));
 		v2.p = m_points.size() - 1;
 
-		vec2 uv0(((t.at(0).x - minX) / dx), ((t.at(0).y - minY) / dy));
-		m_uvs.push_back(uv0);
+		//vec2 uv0(((t.at(0).x - minX) / dx), ((t.at(0).y - minY) / dy));
+		//m_uvs.push_back(uv0);
+		m_uvs.push_back(vec2(t.at(0).x, t.at(0).y));
 		v0.t = m_uvs.size() - 1;
 
-		vec2 uv1(((t.at(1).x - minX) / dx), ((t.at(1).y - minY) / dy));
-		m_uvs.push_back(uv1);
+		//vec2 uv1(((t.at(1).x - minX) / dx), ((t.at(1).y - minY) / dy));
+		//m_uvs.push_back(uv1);
+		m_uvs.push_back(vec2(t.at(1).x, t.at(1).y));
+		m_points.push_back(t.at(1));
 		v1.t = m_uvs.size() - 1;
 
-		vec2 uv2(((t.at(2).x - minX) / dx), ((t.at(2).y - minY) / dy));
-		m_uvs.push_back(uv2);
+		//vec2 uv2(((t.at(2).x - minX) / dx), ((t.at(2).y - minY) / dy));
+		//m_uvs.push_back(uv2);
+		m_uvs.push_back(vec2(t.at(2).x, t.at(2).y));
+		m_points.push_back(t.at(2));
 		v2.t = m_uvs.size() - 1;
 
 
