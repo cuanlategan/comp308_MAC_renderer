@@ -50,6 +50,8 @@ RiverHandler::RiverHandler() {
 	drawPolygons(graph->getTriangles(), &fullMeshDisplay, cGrey, cRed, drawRadius);
 
 	rebuildHeightData(heightMap);	
+
+	riverData = makeRiverPathData();
 }
 
 struct sortByGreaterZ {
@@ -517,20 +519,49 @@ void RiverHandler::rebuildHeightData(Image *heightMap) {
 
 }
 
-vector<vector<vector<float>>> RiverHandler::returnRiverPaths() {
+vector<vector<riverPathData>> RiverHandler::makeRiverPathData() {
 	// vector<vector<vVertexPoint*>> rivers;
-	vector<vector<vector<float>>> pathData;
+	vector<vector<riverPathData>> riverPaths;
 
 	for (vector<vVertexPoint*> river : rivers) {
-		for (vVertexPoint *r : river) {
-			float x = r->getCoords().x;
-			float y = r->getZValue();
-			float z = r->getCoords().y;
-			float f = r->getWater();
+		vector<riverPathData> pathData;
+		for (int x = 0; x < river.size(); x++) {	
+			vVertexPoint *p = river.at(x);
+			riverPathData pData;
+			pData.position = vec3(p->getCoords().x, p->getCoords().y, p->getZValue()*zScalar);
+			pData.water = p->getWater();
+			float maxX = p->getCoords().x;
+			float maxY = p->getCoords().y;
+			float maxZ = p->getZValue();
+			float minX = p->getCoords().x;
+			float minY = p->getCoords().y;
+			float minZ = p->getZValue();
+			// get bounding box
+			for (vVertexPoint *n : p->getNeighbours()) {
+				maxX = max(maxX, p->getCoords().x);
+				maxY = max(maxY, p->getCoords().y);
+				maxZ = max(maxZ, p->getZValue());
+				minX = min(minX, p->getCoords().x);
+				minY = min(minY, p->getCoords().y);
+				minZ = min(minZ, p->getZValue());
+			}
+			maxZ = maxZ * zScalar;
+			minZ = minZ * zScalar;
+			pData.maxCoords = vec3(maxX, maxY, maxZ);
+			pData.minCoords = vec3(minX, minY, minZ);
+			
+			if (x < river.size() - 1) pData.next = vec3(river.at(x + 1)->getCoords().x, river.at(x + 1)->getCoords().y, river.at(x + 1)->getZValue()*zScalar);
+			else pData.next = pData.position;
+			pathData.push_back(pData);
 		}
+		riverPaths.push_back(pathData);
 	}
 
-	return pathData;
+	return riverPaths;
+}
+
+vector<vector<riverPathData>> RiverHandler::returnRiverPathData() {
+	return riverData;
 }
 
 vector<int> RiverHandler::returnRiverTriIndex() {

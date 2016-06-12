@@ -18,18 +18,25 @@ using namespace std;
 using namespace cgra;
 using namespace cimg_library;
 
+struct riverPathData {
+	vec3 position;
+	vec3 minCoords;
+	vec3 maxCoords;
+	float water;
+	vec3 next;
+};
 
 class RiverHandler {
 private:
 	int density = 50;
-	int numberOfRivers = 2;
+	int numberOfRivers = 1;
 	int maxRivers = numberOfRivers * 2;
 	int cutoffPercent = 5;
 	float startWater = 0;
 	float waterScalar = 1;
 	int widthScalar = 10;
 	float zScalar = 0.3;
-	int smoothPasses = 2;
+	int smoothPasses = 1;
 	int maxPasses = 2;
 	int complexMultiplier = density / 10;
 	int riverSamples = max(5, ((smoothPasses * complexMultiplier) + 1));
@@ -55,6 +62,8 @@ private:
 	vector<vVertexPoint*> riverSources;
 	vector<vector<vVertexPoint*>> rivers;
 	vector<vTriangle*> riverTris;
+
+	vector<vector<riverPathData>> riverData;
 
 	CImg<unsigned char> lowRezDisplay;
 	CImg<unsigned char> riverDisplay;
@@ -84,7 +93,7 @@ private:
 
 	void rebuildHeightData(Image*);
 
-	vector<vector<vector<float>>> returnRiverPaths();
+	vector<vector<riverPathData>> makeRiverPathData();
 	
 	
 
@@ -100,6 +109,8 @@ public:
 	Geometry* makeGeo();
 	vector<vector<vec3>> returnRiverTris();
 	vector<int> returnRiverTriIndex();
+	vector<vector<riverPathData>> returnRiverPathData();
+
 	bool addRiver();
 	bool subdivide();
 	
