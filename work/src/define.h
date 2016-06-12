@@ -70,3 +70,27 @@ GLfloat light_3_ambient[] = {.65f, .65f, .65f, 1.0f};
 GLfloat light_3_specular[] = {1.f, 1.f, 1.f, 1.0f};
 
 #endif //CGRA_PROJECT_A3_DEFINE_MATERIALS_H
+
+
+//=====================================================================
+//                      MARK LIGHTS
+//=====================================================================
+ 
+
+GLfloat mark_light_direction[] = { 0.0f, 0.0f, 1.0f, 0.0f };
+
+GLfloat mark_light_diffintensity[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+GLfloat mark_light_ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+GLfloat mark_light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+
+
+GLfloat mark_point_direction[] = { 0.0f, 10.0f, 0.0f, 1.0f };
+GLfloat mark_point_diffintensity[] = { 0.3f, 0.2f, 0.2f, 1.0f };
+GLfloat mark_point_specular[] = { 0.3f, 0.2f, 0.2f, 1.0f };
+
+GLfloat mark_dir_direction[] = { 0.f, 0.5f, -1.0f, 0.0f };
+GLfloat mark_dir_diffintensity[] = { 0.1f, 0.1f, 0.3f, 1.0f };
+GLfloat mark_dir_specular[] = { 0.1f, 0.1f, 0.3f, 1.0f };
+
+GLfloat mark_ambient[] = { 0.00001f, 0.00001f, 0.0f, 1.0f };
