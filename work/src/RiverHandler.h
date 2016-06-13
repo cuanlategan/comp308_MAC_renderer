@@ -12,7 +12,6 @@
 #include "CImg.h"
 #include "splineHandler.hpp"
 #include "geometry.hpp"
-//#include "riverData.hpp"
 
 using namespace std;
 using namespace cgra;

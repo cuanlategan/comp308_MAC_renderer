@@ -180,7 +180,7 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
         cout << "draw_grass: " << draw_grass << endl;
     }
     if (key == 84) { // key t
-
+        if (action == 1) drawWater = !drawWater;
     }
     if (key == 87) { // key w
         //g_camera_eye.z += 0.5f;
@@ -338,27 +338,11 @@ void initShader() {
 // FIXME significant logical errors in blue noise generation. 
 //
 //sampler *g_riverSurface;
-vector<vector<riverSegment>> riverPaths;
 
 void initWater() {
     // FIXME
     /*g_riverSurface = new sampler(0.01);
     g_riverSurface->fillSpace();*/
-    // Sample river data
-    vector<riverSegment> river1;
-    float riverSegment1[13] = {1.0, 1.0, 1.0, 1.0, 0.0,
-                     2.0, 1.0, 2.0, 2.0, 0.0,
-                     0.5, 0.0, 1.0};
-    river1.push_back(riverSegment(vec3(1.0, 1.0, 1.0), vec2(0.0, 1.0),
-                                    vec3(2.0, 1.0, 2.0), vec2(0.0, 2.0),
-                                    0.5, vec2(1.0, 0.0)));
-    float riverSegment2[13] = {2.0, 1.0, 2.0, 2.0, 2.0,
-                                3.0, 3.0, 3.0, 2.5, 2.5,
-                                0.2, 0.5, 0.5};
-    river1.push_back(riverSegment(vec3(2.0, 1.0, 2.0), vec2(2.0, 2.0),
-                                vec3(3.0, 3.0, 3.0), vec2(2.5, 2.5),
-                                0.5, vec2(0.4, 0.6)));
-    riverPaths.push_back(river1);
 }
 
 // Renders the rivers and it's flowing water
@@ -366,6 +350,7 @@ void initWater() {
 //
 void renderWater() {
     // TODO add animated shader
+    vector<vector<riverPathData>> riverPaths = g_riverHandler->returnRiverPathData();
     renderRivers(riverPaths);
 }
 
@@ -482,6 +467,7 @@ void render(int width, int height) {
         }*/
         if (draw_points) { field->renderGrid(g_wave_generator, t); }
 
+        glEnable(GL_BLEND);
         glEnable(GL_COLOR_MATERIAL);
         if (drawWater) renderWater();
 
@@ -530,6 +516,7 @@ void render(int width, int height) {
         }
         glUseProgram(0);
 
+        glEnable(GL_BLEND);
         glEnable(GL_COLOR_MATERIAL);
         if (drawWater) renderWater();
 
@@ -548,7 +535,7 @@ void render(int width, int height) {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glDisable(GL_NORMALIZE);
-    //glDisable(GL_BLEND);
+    glDisable(GL_BLEND);
 }
 
 
