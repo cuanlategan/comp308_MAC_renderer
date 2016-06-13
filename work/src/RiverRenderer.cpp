@@ -10,7 +10,7 @@ using namespace cgra;
 static const float RAISE = 0.01;
 
 void renderRivers(vector<vector<riverPathData>> riverData, bool velocityMode) {
-    glColor4f(0, 0, 1, 0.9);
+    glColor4f(0, 1, 1, 0.9);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     for (int i = 0; i < riverData.size(); i++) {
         glBegin(GL_QUAD_STRIP);
