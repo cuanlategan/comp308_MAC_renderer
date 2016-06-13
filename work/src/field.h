@@ -36,6 +36,14 @@ private:
 public:
 
 
+    float wavelength = 0.133f;
+    float amplitude = 0.005f;
+    float steepnes = 0.8f;
+    float speed = 0.05f;
+    int hasTex = 1;
+    float dirX = 1.3f;
+    float dirY = 0.0f;
+
     Field() {
         grass_clusters = new std::vector<Grass>;
         grid_clusters = new std::vector<Grid>;

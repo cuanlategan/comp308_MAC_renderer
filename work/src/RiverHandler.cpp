@@ -1,7 +1,8 @@
 #include "RiverHandler.h"
 
 
-RiverHandler::RiverHandler() {
+RiverHandler::RiverHandler(int mapNum, int smoothPass ) {
+	smoothPasses = smoothPass;
 
 	lowRezDisplay = CImg<unsigned char>(imageSize, imageSize, 1, 3, 0);
 	riverDisplay = CImg<unsigned char>(imageSize, imageSize, 1, 3, 0);
@@ -16,8 +17,13 @@ RiverHandler::RiverHandler() {
 	const unsigned char cDarkGrey[] = { 64,64,64 };
 	const unsigned char cYellow[] = { 255,255,0 };
 
+
 	//heightMap = new Image("./work/res/textures/simplebump.png");
-	heightMap = new Image("./work/res/textures/test_heightmap.png");
+	if(mapNum == 2){
+		heightMap = new Image("./work/res/textures/test_heightmap.png");
+	} else {
+		heightMap = new Image("./work/res/textures/simplebump.png");
+	}
 
 	this -> graph = new VoronoiHandler(density,heightMap);
 	this->splineMaker = new splineHandler();

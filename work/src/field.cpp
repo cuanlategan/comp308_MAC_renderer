@@ -71,7 +71,7 @@ bool Field::checkRiverFace(int triIndex,Geometry *geo , vector<int> riverTris) {
 
 
     if (find(riverTris.begin(), riverTris.end(), triIndex) != riverTris.end()) {
-        cout << "checkRiverFace: River face found\n";
+        //cout << "checkRiverFace: River face found\n";
         return true;
     }
 
@@ -122,7 +122,7 @@ void Field::generateCluster(Geometry *geo, RiverHandler *riverHandler) {
             std::cout << "area: " << area << "\n";*/
 
             //cgra::vec3 ran = getRandomVertOnFace(triPoint1, triPoint2, triPoint3);
-            for (float i = 0; i < area; i += 0.00004f) {
+            for (float i = 0; i < area; i += 0.00003f) {
                 cgra::vec3 ran = getRandomVertOnFace(triPoint1, triPoint2, triPoint3);
 
                 cgra::vec3 rotatedPoint(ran.x, ran.y, ran.z);
@@ -238,19 +238,18 @@ void Field::renderFieldShader(WaveGenerator *wave_gen, float time, GLint shader)
     glAlphaFunc(GL_GREATER, 0.5f);
 
 
-
     glUniform1f(glGetUniformLocation(shader, "time"), time); // set time uniform in shaders
-    glUniform1f(glGetUniformLocation(shader, "wavelength"), 0.133);
-    glUniform1f(glGetUniformLocation(shader, "amplitude"), 0.005f);
-    glUniform1f(glGetUniformLocation(shader, "steepnes"), 0.8f);
-    glUniform1f(glGetUniformLocation(shader, "speed"), 0.05f);
+    glUniform1f(glGetUniformLocation(shader, "wavelength"), wavelength);
+    glUniform1f(glGetUniformLocation(shader, "amplitude"), amplitude);
+    glUniform1f(glGetUniformLocation(shader, "steepnes"), steepnes);
+    glUniform1f(glGetUniformLocation(shader, "speed"), speed);
     glUniform1i(glGetUniformLocation(shader, "hasTex"), 1);
 
     //GLfloat dir[2] = {1.f, 1.f};
     //glUniform2fv(glGetUniformLocation(shader, "direction"), 2, dir);
 
-    glUniform1f(glGetUniformLocation(shader, "dirX"), 1.3f);
-    glUniform1f(glGetUniformLocation(shader, "dirY"), 0.0f);
+    glUniform1f(glGetUniformLocation(shader, "dirX"), dirX);
+    glUniform1f(glGetUniformLocation(shader, "dirY"), dirY);
 
     glEnableClientState(GL_VERTEX_ARRAY);                        // Enable Vertex Arrays
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);

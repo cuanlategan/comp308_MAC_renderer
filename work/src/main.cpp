@@ -88,11 +88,11 @@ bool drawGround = true;
 bool drawWater = false;
 float t = 0.f;
 
-bool draw_lights = true;
-bool draw_ambiant_light = true;
+bool draw_lights = false;
+bool draw_ambiant_light = false;
 bool draw_spot_light = true;
 bool draw_directional_light = true;
-bool draw_point_light = true;
+bool draw_point_light = false;
 
 bool draw_points = false;
 bool draw_grass = true;
@@ -230,12 +230,42 @@ void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 
     }
 
-    //TODO Clean Up
-    /*vec4 v(light_1_direction[0], light_1_direction[1], light_1_direction[2], light_1_direction[3]);
-    //vec3 v(light_1_direction[0],light_1_direction[1],light_1_direction[2]);
-    v = normalize(v);
-    cout << "l1 pos: " << light_1_position[0] << " " << light_1_position[1] << " " << light_1_position[2] << "   v: " <<
-    v << endl;*/
+
+
+    if (key == 327 && action == 1 ) { // num 7
+        field->dirX += 0.2f;
+        cout << "wind direction: x = " << field->dirX << "  y = " << field->dirY << endl;
+    }
+    if (key == 324 && action == 1) { // num 4
+        field->dirX -= 0.2f;
+        cout << "wind direction: x = " << field->dirX << "  y = " << field->dirY << endl;
+    }
+    if (key == 328 && action == 1) { // num 8
+        field->dirY += 0.2f;
+        cout << "wind direction: x = " << field->dirX << "  y = " << field->dirY << endl;
+    }
+    if (key == 325 && action == 1) { // num 5
+        field->dirY -= 0.2f;
+        cout << "wind direction: x = " << field->dirX << "  y = " << field->dirY << endl;
+    }
+    if (key == 329 && action == 1) { // num 9
+        field->amplitude += 0.01f;
+        cout << "wind amplitude: " << field->amplitude << endl;
+    }
+    if (key == 326 && action == 1) { // num 6
+        field->amplitude -= 0.01f;
+        cout << "wind amplitude: " << field->amplitude << endl;
+    }
+    if (key == 334 && action == 1) { // num +
+        field->speed += 0.05f;
+        cout << "wind speed: " << field->speed << endl;
+    }
+    if (key == 333 && action == 1) { // num -
+        field->speed -= 0.05f;
+        cout << "wind speed: " << field->speed << endl;
+    }
+
+
 }
 
 // Character callback
@@ -627,6 +657,19 @@ void APIENTRY debugCallbackARB(GLenum, GLenum, GLuint, GLenum, GLsizei, const GL
 //
 int main(int argc, char **argv) {
 
+    if(argc != 3){
+        cout << "map number[ 1-2 ] and amount of river smooth-passes[ 0 - 1 recommended ] needed, eg:" << endl << "    ./a3 2 1" << endl;
+        abort(); // Unrecoverable error
+    }
+
+    int mapNum = 1;
+    int smoothPass = 0;
+
+    string str = argv[1];
+    istringstream ( str ) >> mapNum;
+
+    string str2 = argv[2];
+    istringstream ( str2 ) >> smoothPass;
 
 
     // Initialize the GLFW library
@@ -701,7 +744,7 @@ int main(int argc, char **argv) {
     // YOUR CODE GOES HERE
     // ...
 
-    g_riverHandler = new RiverHandler();
+    g_riverHandler = new RiverHandler(mapNum, smoothPass);
     //g_riverHandler->drawAll();
 
     g_geometry = g_riverHandler->makeGeo();
@@ -736,7 +779,7 @@ int main(int argc, char **argv) {
         nbFrames++;
         if (currentTime - lastTime >= 1.0) { // If last prinf() was more than 1 sec ago
             // printf and reset timer
-            printf("%f ms/frame: %f\n", 1000.0 / double(nbFrames), double(nbFrames));
+            //printf("%f ms/frame: %f\n", 1000.0 / double(nbFrames), double(nbFrames));
             nbFrames = 0;
             lastTime += 1.0;
         }

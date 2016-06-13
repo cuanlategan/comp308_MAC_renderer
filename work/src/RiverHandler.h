@@ -97,7 +97,7 @@ private:
 	
 
 public:
-	RiverHandler();
+	RiverHandler(int mapNum, int smoothPass );
 	void drawAll();
 
 	void drawLowRezMesh();

@@ -1,30 +1,36 @@
-COMP308 Assignment 3
+COMP308 Final Project Team MAC
 
-Name :: Cuan Lategan
-Student ID :: 300102253
-
-
-1) List what you have completed:
-
-    All tasks execpt I left the camera controls as the as, and
-    for challenge I only did one thing which was phong shading.
+To start program:
+----------------------------------
+/a3 2 1
+first argument is map number [1-2], second is amount of river smooth passes [ 0 - 1 recommended ]
 
 
-2) List any additional modifications that are not in the brief:
 
 
-3) How to run your code, if it differs from the original assignment:
+keys:
 
-   Working directory for binary must be the res folder.
+Terrian
+----------------------------------------
+down arrow : toggle draw terrian
+up arrow : show full terrian mesh
+right arrow : show river mesh
+left arrow : show low resolution mesh
+spacebar : show wireframe ( app will need to close to return to normal )
 
-   Press r to make the table do a complete spin.
-   Right click to use shaders.
+Grass
+----------------------------------------
+q : toggle drawing grass
+numpad 7 : increase wind direction X
+numpad 4 : decrease wind direction X
+numpad 8 : increase wind direction Y
+numpad 5 : decrease wind direction Y
+numpad 9 : increase wind amplitude
+numpad 6 : decrease wind amplitude
+numpad + : increase wind speed
+numpad - : decrease wind speed
 
-   Spot-light Controls:
-   f to draw spot light icon.
-   WASD keys to move spot light.
-   Arrow keys to tilt and turn.
-   Left-ctrl and spacebar to lift and drop it.
-   q or r to decrease or increase cuttoff angle.
+
+Terrian:
 
 
